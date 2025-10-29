@@ -9,6 +9,7 @@ import { Container } from './components/user/Container';
 import { Button } from './components/user/Button';
 import { Card } from './components/user/Card';
 import { Text } from './components/user/Text';
+import { CardBottom, CardTop } from './components/user/Card';
 
 import {Editor, Frame, Element} from "@craftjs/core";
 import { ClassNames } from '@emotion/react';
@@ -19,7 +20,8 @@ function App() {
       <p className="text-center text-2xl font-bold">A super simple page editor</p>
       <div className='flex-column'>
         <Topbar />
-        <Editor resolver={{Card, Button, Text, Container}}>
+
+        <Editor resolver={{Card, Button, Text, Container, CardTop, CardBottom}}>
 
           <div className='grid grid-cols-4 grid-rows-1 my-2 gap-2'>
             <div className='col-span-3'>
