@@ -21,10 +21,10 @@ function App() {
     <div className='w-[800px]' style={{margin: "0 auto"}}>
       <p className="text-center text-2xl font-bold">A super simple page editor</p>
       <div className='flex-column'>
-        <Topbar />
 
         <Editor resolver={{Card, Button, Text, Container, CardTop, CardBottom}}>
-
+          <Topbar />
+          
           <div className='grid grid-cols-4 grid-rows-1 my-2 gap-2'>
             <div className='col-span-3'>
               <Frame>
