@@ -28,12 +28,17 @@ export const Text = ({text, fontSize}) => {
 }
 
 const TextSettings = () => {
-  const { actions: {setProp}, fontSize } = useNode((node) => ({
-    fontSize: node.data.props.fontSize
+  const { actions: {setProp}, fontSize, props } = useNode((node) => ({
+    fontSize: node.data.props.fontSize,
+    props: node.data.props
   }));
 
   return (
     <>
+      <label htmlFor="text">Texto</label>
+      <input className="form-control" type="text" name="text" id="text" value={props?.text??""}
+        onChange={(e) =>{setProp(props => props.text = e.target.value)}}
+      />
       <FormControl size="small" component="fieldset">
         <FormLabel component="legend">Font size</FormLabel>
         <Slider
