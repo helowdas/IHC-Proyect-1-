@@ -28,7 +28,8 @@ function App() {
               <Frame>
                 <Element is={Container} padding={5} background="#eee" canvas>
                   <Card />
-                  <Button size="small" variant="contained">Clic me</Button>
+                  {/* Botón del lienzo que navega a Home */}
+                  <Button size="small" variant="contained" to="/home">Clic me</Button>
                   <Text size="small" text="hi world"></Text>
                   <Element is={Container} padding={2} background="#999" canvas>
                     <Text size="small" text="It's me again!" />

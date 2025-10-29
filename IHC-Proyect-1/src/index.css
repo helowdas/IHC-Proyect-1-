@@ -1,1 +1,17 @@
 @import 'tailwindcss';
+
+/* Route transition styles */
+.route-wrapper.fadeIn {
+	animation: rr-fade-in 300ms ease-out forwards;
+}
+.route-wrapper.fadeOut {
+	animation: rr-fade-out 300ms ease-in forwards;
+}
+@keyframes rr-fade-in {
+	from { opacity: 0; transform: translateY(12px); }
+	to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes rr-fade-out {
+	from { opacity: 1; transform: translateY(0); }
+	to   { opacity: 0; transform: translateY(-12px); }
+}
