@@ -1,6 +1,6 @@
 // components/user/Button.js
 import React  from "react";
-import {Button as MaterialButton, Grid, FormControl, FormLabel, RadioGroup,Radio, FormControlLabel} from "@mui/material";
+import {Button as MaterialButton, Grid, FormControl, FormLabel, RadioGroup,Radio, FormControlLabel, TextField} from "@mui/material";
 import { useNode } from "@craftjs/core";
 import { useNavigate } from "react-router-dom";
 
@@ -38,27 +38,41 @@ const ButtonSettings = () => {
     <div>
       <FormControl size="small" component="fieldset">
         <FormLabel component="legend">Size</FormLabel>
-        <RadioGroup defaultValue={props.size} onChange={(e) => setProp(props => props.size = e.target.value )}>
+        <RadioGroup defaultValue={props.size} onChange={(e) => setProp(p => p.size = e.target.value )}>
           <FormControlLabel label="Small" value="small" control={<Radio size="small" color="primary" />} />
           <FormControlLabel label="Medium" value="medium" control={<Radio size="small" color="primary" />} />
           <FormControlLabel label="Large" value="large" control={<Radio size="small" color="primary" />} />
         </RadioGroup>
       </FormControl>
+
       <FormControl component="fieldset">
         <FormLabel component="legend">Variant</FormLabel>
-        <RadioGroup defaultValue={props.variant} onChange={(e) => setProp(props => props.variant = e.target.value )}>
+        <RadioGroup defaultValue={props.variant} onChange={(e) => setProp(p => p.variant = e.target.value )}>
           <FormControlLabel label="Text" value="text" control={<Radio size="small" color="primary" />} />
           <FormControlLabel label="Outlined" value="outlined" control={<Radio size="small" color="primary" />} />
           <FormControlLabel label="Contained" value="contained" control={<Radio size="small" color="primary" />} />
         </RadioGroup>
       </FormControl>
+
       <FormControl component="fieldset">
         <FormLabel component="legend">Color</FormLabel>
-        <RadioGroup defaultValue={props.color} onChange={(e) => setProp(props => props.color = e.target.value )}>
+        <RadioGroup defaultValue={props.color} onChange={(e) => setProp(p => p.color = e.target.value )}>
           <FormControlLabel label="Inherit" value="inherit" control={<Radio size="small" color="primary" />} />
           <FormControlLabel label="Primary" value="primary" control={<Radio size="small" color="primary" />} />
           <FormControlLabel label="Secondary" value="secondary" control={<Radio size="small" color="primary" />} />
         </RadioGroup>
+      </FormControl>
+
+      {/* Nueva opción: asignar link */}
+      <FormControl fullWidth component="fieldset" style={{ marginTop: 8 }}>
+        <FormLabel component="legend">Link (opcional)</FormLabel>
+        <TextField
+          size="small"
+          placeholder="/home, /editor, etc."
+          value={props.to || ""}
+          onChange={(e) => setProp(p => p.to = e.target.value)}
+          helperText="Deja vacío para no navegar"
+        />
       </FormControl>
     </div>
   )
@@ -69,7 +83,8 @@ Button.craft = {
     size: "small", 
     variant: "contained",
     color: "primary",
-    text: "Click me"
+    text: "Click me",
+    to: "" // si está vacío, no navega
   },
 
   related: {
