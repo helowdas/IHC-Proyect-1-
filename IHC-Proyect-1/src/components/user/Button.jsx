@@ -27,7 +27,7 @@ export const Button = ({ size = "small", variant = "contained", color = "primary
     <button
       ref={(ref) => connect(drag(ref))}
       type="button"
-      className={classes}
+      className={`${classes} justify-content-center`}
       onClick={handleClick}
     >
       {text}
