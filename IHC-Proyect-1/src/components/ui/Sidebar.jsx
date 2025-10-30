@@ -7,7 +7,7 @@ const Sidebar = ({ items = [] }) => {
 
   return (
     <aside className="w-64 p-4 space-y-3">
-      <div className="d-flex justify-content-center mb-3">
+      <div className="d-flex justify-content-start mb-3">
         <div className="text-center">
           {/* Botón 1 */}
           <Link

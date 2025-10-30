@@ -7,7 +7,7 @@ import {useUploadImage} from '../../hooks/useUploadImage';
 var handleFileChange;
 var uploading = false;
 
-export const Image = ({ src = 'https://placehold.co/1200x500', alt = 'Imagen', width = 100, fit = 'cover' , children }) => {
+export const Image = ({ src = 'https://placehold.co/1200x500', alt = 'Imagen', width = 100, fit = 'cover' , }) => {
 
   const { connectors: { connect, drag }, actions: {setProp} } = useNode((node) => ({
     props: node.data.props,
@@ -21,7 +21,6 @@ export const Image = ({ src = 'https://placehold.co/1200x500', alt = 'Imagen', w
         alt={alt}
         style={{ display: 'block', width: `${width}%`, height: 'auto', objectFit: fit, borderRadius: 4 }}
       />
-      {children}
     </div>
   );
 };
