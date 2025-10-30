@@ -15,3 +15,28 @@
 	from { opacity: 1; transform: translateY(0); }
 	to   { opacity: 0; transform: translateY(-12px); }
 }
+
+/* Jean paul añadi estos colores no te enojes  */
+.btn-a50104 {
+	--a50104: #A50104;
+	background-color: var(--a50104);
+	color: #fff;
+	border-color: var(--a50104);
+}
+.btn-a50104:hover,
+.btn-a50104:focus {
+	background-color: #870103; /* slightly darker on hover */
+	border-color: #870103;
+	color: #fff;
+}
+.btn-outline-a50104 {
+	--a50104: #A50104;
+	background-color: transparent;
+	color: var(--a50104);
+	border: 1px solid var(--a50104);
+}
+.btn-outline-a50104:hover,
+.btn-outline-a50104:focus {
+	background-color: var(--a50104);
+	color: #fff;
+}

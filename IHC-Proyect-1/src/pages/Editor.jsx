@@ -1,5 +1,6 @@
 import Header from '../components/ui/Header';
 import Palette from '../components/ui/Palette';
+import Sidebar from '../components/Sidebar';
 import SettingsLite from '../components/ui/SettingsLite';
 
 import { Container } from '../components/user/Container';
@@ -17,7 +18,11 @@ function App() {
       <Editor resolver={{ Card, Button, Text, Image, Container, CardTop, CardBottom }}>
         <Header />
         <div className="d-flex flex-grow-1" style={{ minHeight: 0 }}>
-          <Palette />
+          {/* Columna izquierda: Sidebar encima de la paleta de componentes */}
+          <div className="d-flex flex-column">
+            <Sidebar />
+            <Palette />
+          </div>
           <div className="flex-grow-1 p-3" style={{ overflow: 'auto' }}>
             <div className="bg-white border rounded-3 p-3">
               <Frame>
