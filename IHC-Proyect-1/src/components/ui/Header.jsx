@@ -56,7 +56,7 @@ export default function Header({ nameSection }) {
     <>
     <div className="d-flex align-items-center justify-content-between px-3 py-2 border-bottom bg-white">
       <div className="d-flex align-items-center gap-3">
-        <div className="h4 m-0 fw-bold">Constructor Web</div>
+        <div className="h4 m-0 fw-bold">Ágora</div>
       </div>
       <div className="d-flex align-items-center gap-2">
         <button

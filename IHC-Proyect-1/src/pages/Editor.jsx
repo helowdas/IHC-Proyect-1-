@@ -73,11 +73,10 @@ function App({nameSection}) {
             <Palette />
           </div>
           <div className="grow p-3" style={{ overflow: 'auto' }}>
-            <div className="bg-white border rounded-3 p-3">
+            <div className="bg-white border rounded-1 px-1">
               <Frame>
                 <Element is={Container} padding={8} background="#ffffff" canvas>
                   {/* Ejemplo de contenido inicial */}
-                  <Image />
                 </Element>
               </Frame>
             </div>

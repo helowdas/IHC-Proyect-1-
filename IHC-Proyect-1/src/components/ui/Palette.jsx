@@ -11,7 +11,7 @@ export default function Palette() {
   const { connectors } = useEditor();
   const [view, setView] = useState('componentes'); // 'componentes' | 'sidebar'
   return (
-    <div className="p-3 border-end bg-body-tertiary" style={{ width: 300 }}>
+    <div className="p-3 border-end bg-body-tertiary" style={{ width: 280 }}>
       {/* Toggle buttons */}
       <div className="d-flex gap-2 mb-2">
         <button

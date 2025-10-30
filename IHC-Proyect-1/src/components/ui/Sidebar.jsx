@@ -1,11 +1,13 @@
 import React, { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useSectionNames } from "../../hooks/useSectionNames";
 import { createSection } from "../../hooks/useCreateSection";
 import { deleteSection } from "../../hooks/useDeleteSection";
+import { renameSection } from "../../hooks/useRenameSection";
 
 const Sidebar = ({ items = [] }) => {
   const { pathname, search } = useLocation();
+  const navigate = useNavigate();
   const currentSection = new URLSearchParams(search).get("section");
   const { names, loading, error, refetch } = useSectionNames();
   const isEditorActive = pathname === "/editor";
@@ -32,11 +34,11 @@ const Sidebar = ({ items = [] }) => {
   };
 
   return (
-    <aside className="w-64 p-4 space-y-3">
+    <aside className="w-64 p-1 overflow-hidden">
       <div className="d-flex justify-content-start mb-3">
         <div className="text-center">
           <div className="d-flex align-items-center justify-content-between mb-2">
-            <div className="fw-semibold">Secciones</div>
+            <div className="fw-semibold text-xl">Secciones</div>
             <button
               type="button"
               className="btn btn-sm btn-outline-secondary"
@@ -48,7 +50,7 @@ const Sidebar = ({ items = [] }) => {
           </div>
 
           {/* Form para crear una nueva sección */}
-          <form className="d-flex gap-2 mb-3" onSubmit={handleCreate}>
+          <form className="d-flex gap-2 mb-4" onSubmit={handleCreate}>
             <input
               type="text"
               className="form-control form-control-sm"
@@ -85,12 +87,35 @@ const Sidebar = ({ items = [] }) => {
               await refetch();
             };
 
+            const onRename = async () => {
+              const proposed = prompt(`Nuevo nombre para "${name}"`, name);
+              const newName = (proposed || '').trim();
+              if (!newName || newName === name) return;
+              const res = await renameSection(name, newName);
+              if (!res.ok) {
+                if (res.code === 'conflict') {
+                  alert('Ya existe una sección con ese nombre.');
+                } else if (res.code === 'not-found') {
+                  alert('No se encontró la sección a renombrar.');
+                } else {
+                  console.error('Error renombrando sección', res.error);
+                  alert('No se pudo renombrar la sección');
+                }
+                return;
+              }
+              // Refrescar lista y, si estaba activa, navegar a la nueva URL
+              await refetch();
+              if (isActive) {
+                navigate(`/editor?section=${encodeURIComponent(newName)}`);
+              }
+            };
+
             return (
-              <div key={name} className="mb-2 d-flex align-items-center justify-content-between gap-2">
-                <div className="flex-grow-1">
+              <div key={name} className="mb-2 d-flex flex-column align-items-start justify-content-between gap-1">
+                <div className="grow d-flex flex-wrap align-items-center justify-content-between gap-2">
                   <Link
                     to={`/editor?section=${encodeURIComponent(name)}`}
-                    className={`btn btn-sm btn-a50104 d-inline-flex align-items-center justify-content-center w-100 ${isActive ? "active" : ""}`}
+                    className={`btn btn-sm btn-a50104 d-inline-flex align-items-center justify-content-center${isActive ? "active" : ""}`}
                     title={name}
                     aria-label={`Ir a ${name}`}
                     aria-current={isActive ? "page" : undefined}
@@ -98,23 +123,37 @@ const Sidebar = ({ items = [] }) => {
                     <i className="bi bi-file-earmark-text fs-5" aria-hidden="true"></i>
                     <span className="ms-1">{name}</span>
                   </Link>
-                  <div>
-                    {isActive ? (
-                      <small className="text-success">Actual: {name}</small>
-                    ) : (
-                      <small className="text-muted">{name}</small>
-                    )}
-                  </div>
-                </div>
-                <button
+                  
+                  <div className="d-flex align-items-stretch gap-1 ms-2">
+                    <button
                   type="button"
-                  className="btn btn-sm btn-outline-danger"
+                  className="btn btn-sm btn-outline-danger p-2"
                   onClick={onDelete}
                   aria-label={`Eliminar sección ${name}`}
                   title="Eliminar sección"
-                >
-                  <i className="bi bi-trash" aria-hidden="true"></i>
-                </button>
+                    >
+                      <i className="bi bi-trash" aria-hidden="true"></i>
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-sm btn-outline-secondary"
+                      onClick={onRename}
+                      aria-label={`Renombrar sección ${name}`}
+                      title="Renombrar sección"
+                    >
+                      <i className="bi bi-pencil" aria-hidden="true"></i>
+                    </button>
+                  </div>
+
+                </div>
+                <div>
+                    {isActive ? (
+                      <small className="text-success fw-semibold">Actual: {name}</small>
+                    ) : (
+                      <small className="text-muted fw-semibold">{name}</small>
+                    )}
+                </div>
+
               </div>
             );
           })}
