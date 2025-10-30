@@ -39,7 +39,7 @@ export default function App() {
 
           {/* Rutas principales */}
           <Route path="/home" element={<Home />} />
-          <Route path="/editor" element={<Editor />} />
+          <Route path="/editor" element={<Editor nameSection={"editor"}/>} />
 
           {/* Rutas del Sidebar usando renderizado condicional por ruta */}
           <Route path="/indice" element={<Page title="Índice">Página índice.</Page>} />

@@ -19,6 +19,6 @@ export function useUploadImage(bucket = "Assets") {
       setIsUploading(false);
     }
   };
-
+  
   return { upload, isUploading, error };
 }

@@ -1,35 +1,16 @@
 import React, { useState } from 'react';
 import { useEditor } from '@craftjs/core';
+import { saveSectionData } from '../../hooks/useSaveSectionData';
 
-export default function Header() {
+export default function Header({ nameSection }) {
   const { enabled, actions, query } = useEditor((state) => ({
     enabled: state.options.enabled,
   }));
   const [showImport, setShowImport] = useState(false);
   const [importText, setImportText] = useState('');
   const [importError, setImportError] = useState('');
-
-  const handleExport = async () => {
-    const json = query.serialize();
-    console.log(json);
-    try {
-      if (navigator.clipboard && window.isSecureContext) {
-        await navigator.clipboard.writeText(json);
-      } else {
-        const ta = document.createElement('textarea');
-        ta.value = json;
-        ta.style.position = 'fixed';
-        ta.style.left = '-9999px';
-        document.body.appendChild(ta);
-        ta.focus();
-        ta.select();
-        document.execCommand('copy');
-        document.body.removeChild(ta);
-      }
-    } catch (e) {
-      console.error('No se pudo copiar al portapapeles', e);
-    }
-  };
+  const [isSaving, setIsSaving] = useState(false);
+  const sectionName = nameSection || '';
 
   const handleClear = () => {
     if (!confirm('¿Limpiar el lienzo? Esta acción borrará el contenido.')) return;
@@ -49,28 +30,25 @@ export default function Header() {
     actions.deserialize(JSON.stringify(emptyTree));
   };
 
-  // Importar/Cargar estado pegando JSON en un textarea
-  const handleImport = () => {
-    setImportError('');
-    const raw = importText?.trim();
-    if (!raw) {
-      setImportError('Pega el JSON del estado antes de continuar.');
-      return;
-    }
-    // Validar que sea JSON válido sin transformar el string
+  // Guardar estado en Supabase y bloquear el editor mientras guarda
+  const handleSave = async () => {
     try {
-      JSON.parse(raw);
+      if (!sectionName) {
+        alert('No hay nombre de sección (prop nameSection).');
+        return;
+      }
+      setIsSaving(true);
+      actions.setOptions((opts) => (opts.enabled = false));
+      const json = query.serialize();
+      console.log('Saving section:', sectionName, json);
+      await saveSectionData(sectionName, json);
     } catch (e) {
-      setImportError('El contenido no es un JSON válido.');
-      return;
-    }
-    try {
-      actions.deserialize(raw);
-      setShowImport(false);
-      setImportText('');
-    } catch (e) {
-      console.error('No se pudo cargar el estado', e);
-      setImportError('No se pudo cargar el estado. Verifica que sea un JSON exportado por este editor.');
+      console.error('Error al guardar la sección', e);
+      alert('No se pudo guardar. Revisa la consola para más detalles.');
+    } finally {
+      // Al terminar, activar el editor
+      actions.setOptions((opts) => (opts.enabled = true));
+      setIsSaving(false);
     }
   };
 
@@ -88,53 +66,21 @@ export default function Header() {
         >
           {enabled ? 'Desactivar' : 'Activar'} editor
         </button>
-        <button type="button" className="btn btn-outline-primary" onClick={() => setShowImport(true)}>
-          Cargar estado
+
+        <button type="button" className="btn btn-success d-flex justify-content-between align-items-center gap-2" onClick={handleSave} disabled={isSaving || !sectionName}>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-floppy-fill" viewBox="0 0 16 16">
+              <path d="M0 1.5A1.5 1.5 0 0 1 1.5 0H3v5.5A1.5 1.5 0 0 0 4.5 7h7A1.5 1.5 0 0 0 13 5.5V0h.086a1.5 1.5 0 0 1 1.06.44l1.415 1.414A1.5 1.5 0 0 1 16 2.914V14.5a1.5 1.5 0 0 1-1.5 1.5H14v-5.5A1.5 1.5 0 0 0 12.5 9h-9A1.5 1.5 0 0 0 2 10.5V16h-.5A1.5 1.5 0 0 1 0 14.5z"/>
+              <path d="M3 16h10v-5.5a.5.5 0 0 0-.5-.5h-9a.5.5 0 0 0-.5.5zm9-16H4v5.5a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 .5-.5zM9 1h2v4H9z"/>
+            </svg>
+            {isSaving ? 'Guardando…' : 'Guardar'}
         </button>
-        <button type="button" className="btn btn-primary" onClick={handleExport}>
-          Copiar Estado
-        </button>
+      
         <button type="button" className="btn btn-danger" onClick={handleClear}>
           Limpiar
         </button>
       </div>
-  </div>
-  {showImport && (
-      <div
-        className="position-fixed top-0 start-0 w-100 h-100"
-        style={{ background: 'rgba(0,0,0,0.35)', zIndex: 1050 }}
-        onClick={() => setShowImport(false)}
-      >
-        <div className="modal-dialog modal-lg modal-dialog-centered" onClick={(e) => e.stopPropagation()}>
-          <div className="modal-content">
-            <div className="modal-header">
-              <h5 className="modal-title">Cargar estado</h5>
-              <button type="button" className="btn-close" onClick={() => setShowImport(false)} />
-            </div>
-            <div className="modal-body">
-              <label className="form-label">Pega aquí el JSON exportado</label>
-              <textarea
-                className="form-control"
-                rows={12}
-                value={importText}
-                onChange={(e) => setImportText(e.target.value)}
-                placeholder='{"ROOT":{...}}'
-              />
-              {importError && <div className="alert alert-danger mt-3">{importError}</div>}
-              <div className="form-text">Este JSON debe ser generado con el botón "Exportar".</div>
-            </div>
-            <div className="modal-footer">
-              <button type="button" className="btn btn-secondary" onClick={() => setShowImport(false)}>
-                Cancelar
-              </button>
-              <button type="button" className="btn btn-success" onClick={handleImport}>
-                Cargar
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    )}
+    </div>
+  
     </>
   );
 }
