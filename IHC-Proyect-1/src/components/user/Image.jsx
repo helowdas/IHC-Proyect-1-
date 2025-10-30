@@ -1,8 +1,19 @@
-import React from 'react';
-import { useNode } from '@craftjs/core';
 
-export const Image = ({ src = 'https://placehold.co/1200x500', alt = 'Imagen', width = 100, fit = 'cover' }) => {
-  const { connectors: { connect, drag } } = useNode();
+import { useNode } from '@craftjs/core';
+import { uploadImage } from '../../../SupabaseCredentials';
+import { useState } from 'react';
+import {useUploadImage} from '../../hooks/useUploadImage';
+
+var handleFileChange;
+var uploading = false;
+
+export const Image = ({ src = 'https://placehold.co/1200x500', alt = 'Imagen', width = 100, fit = 'cover' , children }) => {
+
+  const { connectors: { connect, drag }, actions: {setProp} } = useNode((node) => ({
+    props: node.data.props,
+  }));
+
+
   return (
     <div ref={(ref) => connect(drag(ref))}>
       <img
@@ -10,6 +21,7 @@ export const Image = ({ src = 'https://placehold.co/1200x500', alt = 'Imagen', w
         alt={alt}
         style={{ display: 'block', width: `${width}%`, height: 'auto', objectFit: fit, borderRadius: 4 }}
       />
+      {children}
     </div>
   );
 };
@@ -19,6 +31,8 @@ export function ImageSettings() {
   const { actions: { setProp }, props } = useNode((node) => ({
     props: node.data.props,
   }));
+
+  const {upload, isUploading, error} = useUploadImage("Assets");
 
   return(
     <>
@@ -33,6 +47,22 @@ export function ImageSettings() {
             placeholder="https://..."
           />
         </div>
+
+        <div>
+          <input
+            className="form-control form-control-sm"
+            type="file"
+            accept='image/*'
+            onChange={async (e) => {
+              const file = e.target.files?.[0];
+              const url = await upload(file);
+              if (url) setProp((p) => (p.src = url));
+            }}
+            disabled={isUploading}
+          />
+          {isUploading && <div className="text-info small mt-1">Subiendo imagen...</div>}
+        </div>
+
         <div>
           <label className="form-label">Texto alternativo</label>
           <input
@@ -43,6 +73,7 @@ export function ImageSettings() {
             placeholder="Descripción"
           />
         </div>
+
         <div>
           <label className="form-label">Ancho (%)</label>
           <input
