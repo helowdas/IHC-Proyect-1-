@@ -43,6 +43,20 @@ function SectionDataLoader({ sectionName }) {
   return null;
 }
 
+// Muestra el panel de Settings solo si hay un nodo seleccionado
+function SelectionSidebar() {
+  const { currentNodeId } = useEditor((state) => {
+    const [id] = state.events.selected || [];
+    return { currentNodeId: id };
+  });
+  if (!currentNodeId) return null;
+  return (
+    <div className="border-start bg-white" style={{ width: 320 }}>
+      <SettingsLite />
+    </div>
+  );
+}
+
 function App({nameSection}) {
   const [searchParams] = useSearchParams();
   const sectionFromQuery = searchParams.get('section') || nameSection;
@@ -53,12 +67,12 @@ function App({nameSection}) {
         <Header nameSection={sectionFromQuery} />
         {/* Carga el estado inicial del editor desde Supabase según la sección */}
         <SectionDataLoader sectionName={sectionFromQuery} />
-        <div className="d-flex flex-grow-1" style={{ minHeight: 0 }}>
+        <div className="d-flex grow" style={{ minHeight: 0 }}>
           {/* Columna izquierda: Sidebar encima de la paleta de componentes */}
           <div className="d-flex flex-column">
             <Palette />
           </div>
-          <div className="flex-grow-1 p-3" style={{ overflow: 'auto' }}>
+          <div className="grow p-3" style={{ overflow: 'auto' }}>
             <div className="bg-white border rounded-3 p-3">
               <Frame>
                 <Element is={Container} padding={8} background="#ffffff" canvas>
@@ -68,9 +82,7 @@ function App({nameSection}) {
               </Frame>
             </div>
           </div>
-          <div className="border-start bg-white" style={{ width: 320 }}>
-            <SettingsLite />
-          </div>
+          <SelectionSidebar />
         </div>
       </Editor>
     </div>
