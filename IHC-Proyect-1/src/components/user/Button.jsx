@@ -1,10 +1,9 @@
-// components/user/Button.js
-import React  from "react";
-import {Button as MaterialButton, Grid, FormControl, FormLabel, RadioGroup,Radio, FormControlLabel, TextField} from "@mui/material";
+// components/user/Button.jsx (Bootstrap/Tailwind)
+import React from "react";
 import { useNode } from "@craftjs/core";
 import { useNavigate } from "react-router-dom";
 
-export const Button = ({ size, variant, color, to, children }) => {
+export const Button = ({ size = "small", variant = "contained", color = "primary", to = "", text = "Click me", className = "", children }) => {
   const {
     connectors: { connect, drag },
   } = useNode();
@@ -16,16 +15,23 @@ export const Button = ({ size, variant, color, to, children }) => {
     }
   };
 
+  // Map props -> Bootstrap classes and merge with custom className
+  const colorToken = (color || "primary").toLowerCase();
+  const isOutline = variant === "outlined";
+  const isLink = variant === "text";
+  const base = isLink ? "btn btn-link" : `btn ${isOutline ? "btn-outline-" : "btn-"}${colorToken}`;
+  const sizeCls = size === "large" ? "btn-lg" : size === "small" ? "btn-sm" : ""; // medium => default
+  const classes = [base, sizeCls, className].filter(Boolean).join(" ");
+
   return (
-    <MaterialButton
+    <button
       ref={(ref) => connect(drag(ref))}
-      size={size}
-      variant={variant}
-      color={color}
+      type="button"
+      className={classes}
       onClick={handleClick}
     >
-      {children}
-    </MaterialButton>
+      {text}
+    </button>
   )
 }
 
@@ -35,46 +41,71 @@ const ButtonSettings = () => {
   }));
 
   return (
-    <div>
-      <FormControl size="small" component="fieldset">
-        <FormLabel component="legend">Size</FormLabel>
-        <RadioGroup defaultValue={props.size} onChange={(e) => setProp(p => p.size = e.target.value )}>
-          <FormControlLabel label="Small" value="small" control={<Radio size="small" color="primary" />} />
-          <FormControlLabel label="Medium" value="medium" control={<Radio size="small" color="primary" />} />
-          <FormControlLabel label="Large" value="large" control={<Radio size="small" color="primary" />} />
-        </RadioGroup>
-      </FormControl>
-
-      <FormControl component="fieldset">
-        <FormLabel component="legend">Variant</FormLabel>
-        <RadioGroup defaultValue={props.variant} onChange={(e) => setProp(p => p.variant = e.target.value )}>
-          <FormControlLabel label="Text" value="text" control={<Radio size="small" color="primary" />} />
-          <FormControlLabel label="Outlined" value="outlined" control={<Radio size="small" color="primary" />} />
-          <FormControlLabel label="Contained" value="contained" control={<Radio size="small" color="primary" />} />
-        </RadioGroup>
-      </FormControl>
-
-      <FormControl component="fieldset">
-        <FormLabel component="legend">Color</FormLabel>
-        <RadioGroup defaultValue={props.color} onChange={(e) => setProp(p => p.color = e.target.value )}>
-          <FormControlLabel label="Inherit" value="inherit" control={<Radio size="small" color="primary" />} />
-          <FormControlLabel label="Primary" value="primary" control={<Radio size="small" color="primary" />} />
-          <FormControlLabel label="Secondary" value="secondary" control={<Radio size="small" color="primary" />} />
-        </RadioGroup>
-      </FormControl>
-
-      {/* Nueva opción: asignar link */}
-      <FormControl fullWidth component="fieldset" style={{ marginTop: 8 }}>
-        <FormLabel component="legend">Link (opcional)</FormLabel>
-        <TextField
-          size="small"
-          placeholder="/home, /editor, etc."
-          value={props.to || ""}
-          onChange={(e) => setProp(p => p.to = e.target.value)}
-          helperText="Deja vacío para no navegar"
-        />
-      </FormControl>
-    </div>
+    <>
+      <div className="d-grid gap-3">
+        <div>
+          <label className="form-label">Texto</label>
+          <input
+            className="form-control form-control-sm"
+            type="text"
+            value={props.text ?? ""}
+            onChange={(e) => setProp((props) => (props.text = e.target.value))}
+            placeholder="Texto del botón"
+          />
+        </div>
+        <div>
+          <label className="form-label">Tamaño</label>
+          <select
+            className="form-select form-select-sm"
+            value={props.size || 'small'}
+            onChange={(e) => setProp((props) => (props.size = e.target.value))}
+          >
+            <option value="small">Small</option>
+            <option value="medium">Medium</option>
+            <option value="large">Large</option>
+          </select>
+        </div>
+        <div>
+          <label className="form-label">Variante</label>
+          <select
+            className="form-select form-select-sm"
+            value={props.variant || 'contained'}
+            onChange={(e) => setProp((props) => (props.variant = e.target.value))}
+          >
+            <option value="text">Text</option>
+            <option value="outlined">Outlined</option>
+            <option value="contained">Contained</option>
+          </select>
+        </div>
+        <div>
+          <label className="form-label">Color</label>
+          <select
+            className="form-select form-select-sm"
+            value={props.color || 'primary'}
+            onChange={(e) => setProp((props) => (props.color = e.target.value))}
+          >
+            <option value="primary">primary</option>
+            <option value="secondary">secondary</option>
+            <option value="success">success</option>
+            <option value="danger">danger</option>
+            <option value="warning">warning</option>
+            <option value="info">info</option>
+            <option value="light">light</option>
+            <option value="dark">dark</option>
+          </select>
+        </div>
+        <div>
+          <label className="form-label">URL destino (opcional)</label>
+          <input
+            className="form-control form-control-sm"
+            type="text"
+            value={props.to ?? ''}
+            onChange={(e) => setProp((props) => (props.to = e.target.value))}
+            placeholder="/ruta-o-url"
+          />
+        </div>
+      </div>
+    </>
   )
 };
 
@@ -84,7 +115,8 @@ Button.craft = {
     variant: "contained",
     color: "primary",
     text: "Click me",
-    to: "" // si está vacío, no navega
+    to: "", // si está vacío, no navega
+    className: ""
   },
 
   related: {

@@ -1,93 +1,87 @@
-// components/user/Container.js
+// components/user/Container.jsx
 import React from "react";
-import { FormControl, FormLabel, Slider } from "@mui/material";
-import { Paper } from "@mui/material";
 import { useNode } from "@craftjs/core";
 
 export const Container = ({ background, padding = 0, borderRadius = 0, boxShadow = "", children }) => {
   const { connectors: { connect, drag } } = useNode();
   return (
-    <Paper
+    <div
       ref={ref => connect(drag(ref))}
       style={{
         margin: "5px 0",
-        background,
+        background: `${background}`,
         padding: `${padding}px`,
         borderRadius: `${borderRadius}px`,
         boxShadow: boxShadow ? `0 4px 8px ${boxShadow}` : "none"
       }}
     >
       {children}
-    </Paper>
+    </div>
   )
 }
-
 export const ContainerSettings = () => {
-  const { background, padding, borderRadius, boxShadow, actions: { setProp } } = useNode(node => ({
-    background: node.data.props.background,
-    padding: node.data.props.padding,
-    borderRadius: node.data.props.borderRadius,
-    boxShadow: node.data.props.boxShadow
+  // Get current props and the setter from Craft.js
+  const { actions: { setProp }, props } = useNode((node) => ({
+    props: node.data.props,
   }));
   return (
-    <div>
-      <FormControl fullWidth={true} margin="normal" component="fieldset">
-        <FormLabel component="legend">Background</FormLabel>
-        <input
-          type="color"
-          value={background || '#000000'}
-          onChange={(e) => setProp(props => props.background = e.target.value)}
-          style={{ width: 40, height: 40, padding: 0, border: 'none', background: 'transparent' }}
-        />
-      </FormControl>
-      <FormControl fullWidth={true} margin="normal" component="fieldset">
-        <FormLabel component="legend">Padding</FormLabel>
-        <Slider
-          value={typeof padding === 'number' ? padding : 3}
-          step={1}
-          min={0}
-          max={100}
-          valueLabelDisplay="auto"
-          onChange={(_, value) => {
-            const v = Array.isArray(value) ? value[0] : value;
-            if (typeof v === 'number') {
-              setProp(props => props.padding = v)
-            }
-          }}
-        />
-      </FormControl>
-      {/* Nuevo apartado: Decoration */}
-      <FormControl fullWidth={true} margin="normal" component="fieldset">
-        <FormLabel component="legend">Border Radius</FormLabel>
-        <Slider
-          value={typeof borderRadius === 'number' ? borderRadius : 0}
-          step={1}
-          min={0}
-          max={50}
-          valueLabelDisplay="auto"
-          onChange={(_, value) => {
-            const v = Array.isArray(value) ? value[0] : value;
-            if (typeof v === 'number') {
-              setProp(props => props.borderRadius = v)
-            }
-          }}
-        />
-      </FormControl>
-      <FormControl fullWidth={true} margin="normal" component="fieldset">
-        <FormLabel component="legend">Box Shadow</FormLabel>
-        <input
-          type="color"
-          value={boxShadow || '#000000'}
-          onChange={(e) => setProp(props => props.boxShadow = e.target.value)}
-          style={{ width: 40, height: 40, padding: 0, border: 'none', background: 'transparent' }}
-        />
-      </FormControl>
-    </div>
+    <>
+      <div className="d-grid gap-3">
+        <div>
+          <label className="form-label">Fondo</label>
+          <input
+            type="color"
+            className="form-control form-control-color"
+            value={props.background || '#ffffff'}
+            onChange={(e) => setProp((props) => (props.background = e.target.value))}
+          />
+        </div>
+
+        <div>
+          <label className="form-label">Padding</label>
+          <input
+            type="range"
+            className="form-range"
+            min={0}
+            max={100}
+            step={1}
+            value={typeof props.padding === 'number' ? props.padding : 3}
+            onChange={(e) => setProp((props) => (props.padding = Number(e.target.value)))}
+          />
+        </div>
+
+        <div>
+          <label className="form-label">Border Radius</label>
+          <input
+            type="range"
+            className="form-range"
+            min={0}
+            max={100}
+            step={1}
+            value={typeof props.borderRadius === 'number' ? props.borderRadius : 0}
+            onChange={(e) => setProp((props) => (props.borderRadius = Number(e.target.value)))}
+          />
+          <div className="small text-muted">{props.borderRadius ?? 0}px</div>
+        </div>
+
+        <div>
+          <label className="form-label">Box Shadow</label>
+          <input
+            type="color"
+            className="form-control form-control-color"
+            value={props.boxShadow || '#000000'}
+            onChange={(e) => setProp((props) => (props.boxShadow = e.target.value))}
+            style={{ width: 40, height: 40, padding: 0, border: 'none', background: 'transparent' }}
+          />
+        </div>
+          
+      </div>
+    </>
   )
 }
 
 export const ContainerDefaultProps = {
-  background: "#ffffff",
+  background: "#adb5bd",
   padding: 3,
   borderRadius: 0,
   boxShadow: ""

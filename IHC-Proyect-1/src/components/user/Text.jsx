@@ -35,33 +35,37 @@ const TextSettings = () => {
 
   return (
     <>
-      <label htmlFor="text">Texto</label>
-      <input className="form-control" type="text" name="text" id="text" value={props?.text??""}
-        onChange={(e) =>{setProp(props => props.text = e.target.value)}}
-      />
-      <FormControl size="small" component="fieldset">
-        <FormLabel component="legend">Font size</FormLabel>
-        <Slider
-          value={typeof fontSize === 'number' ? fontSize : 20}
-          step={1}
-          min={1}
-          max={50}
-          valueLabelDisplay="auto"
-          onChange={(_, value) => {
-            const v = Array.isArray(value) ? value[0] : value;
-            if (typeof v === 'number') {
-              setProp(props => props.fontSize = v);
-            }
-          }}
-        />
-      </FormControl>
+      <div className="d-grid gap-3">
+          <div>
+            <label className="form-label">Texto</label>
+            <input
+              className="form-control form-control-sm"
+              type="text"
+              value={props.text ?? ''}
+              onChange={(e) => setProp(props => props.text = e.target.value)}
+            />
+          </div>
+          <div>
+            <label className="form-label">Tamaño de fuente</label>
+            <input
+              type="range"
+              className="form-range"
+              min={8}
+              max={64}
+              step={1}
+              value={typeof props.fontSize === 'number' ? props.fontSize : 20}
+              onChange={(e) => setProp(props => props.fontSize = Number(e.target.value))}
+            />
+            <div className="small text-muted">{props.fontSize ?? 20}px</div>
+          </div>
+        </div>
     </>
   )
 }
 
 Text.craft = {
   props: {
-    text: "Hi",
+    text: "Texto de ejemplo",
     fontSize: 20
   },
   rules:{

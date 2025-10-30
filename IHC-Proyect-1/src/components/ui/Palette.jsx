@@ -4,6 +4,7 @@ import { Container } from '../user/Container';
 import { Button } from '../user/Button';
 import { Text } from '../user/Text';
 import { Image } from '../user/Image';
+import { Card } from '../user/Card';
 
 export default function Palette() {
   const { connectors } = useEditor();
@@ -45,6 +46,14 @@ export default function Palette() {
           type="button"
         >
           <span className="bi bi-square">▢</span> Contenedor
+        </button>
+
+        <button
+          ref={(ref) => ref && connectors.create(ref, <Element is={Card} />)}
+          className="btn btn-light d-flex align-items-center gap-2 text-start"
+          type="button"
+        >
+          <span className="bi bi-credit-card-2-front">💳</span> Tarjeta
         </button>
       </div>
     </div>
