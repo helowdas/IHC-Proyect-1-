@@ -44,7 +44,7 @@ export default function Palette() {
               className="btn btn-light d-flex align-items-center gap-2 text-start"
               type="button"
             >
-              <span className="bi bi-type">T</span> Texto
+              <span className="bi bi-type"></span> Texto
             </button>
 
             <button
@@ -52,7 +52,7 @@ export default function Palette() {
               className="btn btn-light d-flex align-items-center gap-2 text-start"
               type="button"
             >
-              <span className="bi bi-lightning">✦</span> Botón
+              <span className="bi bi-lightning"></span> Botón
             </button>
 
             <button
@@ -60,7 +60,7 @@ export default function Palette() {
               className="btn btn-light d-flex align-items-center gap-2 text-start"
               type="button"
             >
-              <span className="bi bi-image">🖼️</span> Imagen
+              <span className="bi bi-image"></span> Imagen
             </button>
 
             <button
@@ -68,7 +68,7 @@ export default function Palette() {
               className="btn btn-light d-flex align-items-center gap-2 text-start"
               type="button"
             >
-              <span className="bi bi-square">▢</span> Contenedor
+              <span className="bi bi-square"></span> Contenedor
             </button>
 
             <button
@@ -76,7 +76,7 @@ export default function Palette() {
               className="btn btn-light d-flex align-items-center gap-2 text-start"
               type="button"
             >
-              <span className="bi bi-credit-card-2-front">💳</span> Tarjeta
+              <span className="bi bi-credit-card-2-front"></span> Tarjeta
             </button>
           </div>
         </>
