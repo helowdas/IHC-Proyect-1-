@@ -15,7 +15,11 @@
 	font-display: swap;
 }
 
-
+@theme{
+	/* fuentes */
+	--font-amazonica: 'Amazonica', system-ui, sans-serif;
+	--font-jungle-camp: 'Jungle Camp', system-ui, sans-serif;
+}
 
 /* Route transition styles */
 .route-wrapper.fadeIn {
