@@ -1,5 +1,5 @@
 // components/user/Text.js
-import React, { useEffect, useState} from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useNode } from "@craftjs/core";
 
 export const Text = ({ text, fontSize, fontClass, translateX = 0, translateY = 0, zIndex = 0, opacity = 1, textColor = '#000000', textShadowX = 0, textShadowY = 0, textShadowBlur = 0, textShadowColor = '#000000', textAlign = 'left', lineHeight = 1.5 }) => {
@@ -9,8 +9,36 @@ export const Text = ({ text, fontSize, fontClass, translateX = 0, translateY = 0
   }));
 
   const [editable, setEditable] = useState(false);
-
   useEffect(() => {!hasSelectedNode && setEditable(false)},[hasSelectedNode])
+
+  // Handle de movimiento (misma estructura que Card, actualizando translateX/Y)
+  const moveStart = useRef({ mx: 0, my: 0, x: Number(translateX) || 0, y: Number(translateY) || 0 });
+  const onMoveMouseDown = (e) => {
+    e.stopPropagation();
+    moveStart.current = {
+      mx: e.clientX,
+      my: e.clientY,
+      x: Number(translateX) || 0,
+      y: Number(translateY) || 0,
+    };
+
+    const onMove = (ev) => {
+      const dx = ev.clientX - moveStart.current.mx;
+      const dy = ev.clientY - moveStart.current.my;
+      setProp((p) => {
+        p.translateX = Math.round((moveStart.current.x ?? 0) + dx);
+        p.translateY = Math.round((moveStart.current.y ?? 0) + dy);
+      }, 0);
+    };
+
+    const onUp = () => {
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup', onUp);
+    };
+
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+  };
 
   return (
     <div 
@@ -26,18 +54,37 @@ export const Text = ({ text, fontSize, fontClass, translateX = 0, translateY = 0
           textAlign: textAlign || 'left',
           lineHeight: (typeof lineHeight === 'number' && Number.isFinite(lineHeight)) ? lineHeight : (parseFloat(lineHeight) || 1.5),
           textShadow: `${Number(textShadowX) || 0}px ${Number(textShadowY) || 0}px ${Number(textShadowBlur) || 0}px ${textShadowColor || '#000000'}`,
-          whiteSpace: 'pre-wrap',      // respeta saltos de línea del textarea
-          overflowWrap: 'anywhere',    // rompe palabras/largas sin espacios
-          wordBreak: 'break-word',     // fallback para navegadores más viejos
+          whiteSpace: 'pre-wrap',
+          overflowWrap: 'anywhere',
+          wordBreak: 'break-word',
         }}
       >
         {text}
       </p>
+
+      {hasSelectedNode && (
+        <>
+          {/* Handle de movimiento */}
+          <div
+            onMouseDown={onMoveMouseDown}
+            title="Arrastra para mover"
+            style={{
+              position: 'absolute',
+              left: 4,
+              top: 4,
+              width: 14,
+              height: 14,
+              borderRadius: 3,
+              cursor: 'move',
+              boxShadow: '0 0 0 1px rgba(0,0,0,0.15)',
+              background: 'rgba(0,0,0,0.15)',
+            }}
+          />
+        </>
+      )}
     </div>
   )
 }
-
-
 
 const TextSettings = () => {
   const { actions: { setProp }, props } = useNode((node) => ({
