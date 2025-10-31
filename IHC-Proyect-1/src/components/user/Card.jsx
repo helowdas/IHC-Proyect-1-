@@ -133,6 +133,9 @@ export const Card = ({
         height: typeof height === 'number' ? `${height}px` : height,
         minWidth,
         minHeight,
+        boxSizing: 'border-box',
+        // contorno solo cuando está seleccionada
+        outline: selected ? '1px dashed #3b82f6' : undefined,
       }}
     >
       <Container background={background} padding={padding}>
@@ -159,6 +162,22 @@ export const Card = ({
               height: 14,
               borderRadius: 3,
               cursor: 'move',
+              boxShadow: '0 0 0 1px rgba(0,0,0,0.15)',
+              background: 'rgba(0,0,0,0.15)',
+            }}
+          />
+          {/* Handle de redimensionado (esquina inferior derecha) */}
+          <div
+            onMouseDown={onResizeMouseDown}
+            title="Arrastra para redimensionar"
+            style={{
+              position: 'absolute',
+              right: 4,
+              bottom: 4,
+              width: 14,
+              height: 14,
+              borderRadius: 3,
+              cursor: 'nwse-resize',
               boxShadow: '0 0 0 1px rgba(0,0,0,0.15)',
               background: 'rgba(0,0,0,0.15)',
             }}

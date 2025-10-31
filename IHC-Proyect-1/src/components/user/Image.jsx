@@ -1,7 +1,6 @@
-
 import { useNode } from '@craftjs/core';
 import { uploadImage } from '../../../SupabaseCredentials';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import {useUploadImage} from '../../hooks/useUploadImage';
 import { useNavigate } from 'react-router-dom';
 
@@ -25,8 +24,9 @@ export const Image = ({
   externalNewTab = true,
 }) => {
 
-  const { connectors: { connect, drag }, actions: {setProp} } = useNode((node) => ({
+  const { connectors: { connect, drag }, actions: {setProp}, selected } = useNode((node) => ({
     props: node.data.props,
+    selected: node.events.selected,
   }));
   const navigate = useNavigate();
 
@@ -62,6 +62,34 @@ export const Image = ({
     }
   };
 
+  // Handle de movimiento (igual que Button.jsx)
+  const moveStart = useRef({ mx: 0, my: 0, x: Number(translateX) || 0, y: Number(translateY) || 0 });
+  const onMoveMouseDown = (e) => {
+    e.stopPropagation();
+    moveStart.current = {
+      mx: e.clientX,
+      my: e.clientY,
+      x: Number(translateX) || 0,
+      y: Number(translateY) || 0,
+    };
+
+    const onMove = (ev) => {
+      const dx = ev.clientX - moveStart.current.mx;
+      const dy = ev.clientY - moveStart.current.my;
+      setProp((p) => {
+        p.translateX = Math.round((moveStart.current.x ?? 0) + dx);
+        p.translateY = Math.round((moveStart.current.y ?? 0) + dy);
+      }, 0);
+    };
+
+    const onUp = () => {
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup', onUp);
+    };
+
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+  };
 
   const actionable = (
     (actionType === 'route' && (to || '').trim()) ||
@@ -86,6 +114,27 @@ export const Image = ({
         alt={alt}
         style={{ display: 'block', width: `${width}%`, height: 'auto', objectFit: fit, borderRadius: 4 }}
       />
+
+      {selected && (
+        <>
+          {/* Handle de movimiento */}
+          <div
+            onMouseDown={onMoveMouseDown}
+            title="Arrastra para mover"
+            style={{
+              position: 'absolute',
+              left: 4,
+              top: 4,
+              width: 14,
+              height: 14,
+              borderRadius: 3,
+              cursor: 'move',
+              boxShadow: '0 0 0 1px rgba(0,0,0,0.15)',
+              background: 'rgba(0,0,0,0.15)',
+            }}
+          />
+        </>
+      )}
     </div>
   );
 };

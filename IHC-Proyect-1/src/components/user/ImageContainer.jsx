@@ -1,6 +1,7 @@
 // filepath: c:\Users\Helowdas\Documents\GitHub\IHC-Proyect-1-\IHC-Proyect-1\src\components\user\BackgroundImageContainer.jsx
 import { useEditor, useNode } from '@craftjs/core';
 import { useUploadImage } from '../../hooks/useUploadImage';
+import { useRef } from 'react';
 
 export const BackgroundImageContainer = ({
   backgroundImage = 'https://placehold.co/1200x500',
@@ -26,10 +27,41 @@ export const BackgroundImageContainer = ({
   transparentBackground = false,
   children,
 }) => {
-  const { connectors: { connect, drag } } = useNode();
+  const { connectors: { connect, drag }, actions: { setProp }, selected } = useNode((node) => ({
+    selected: node.events.selected,
+  }));
   const { enabled } = useEditor((state) => ({ enabled: state.options.enabled }));
 
   const textAlign = align === 'center' ? 'center' : (align === 'flex-end' ? 'right' : 'left');
+
+  // Handle de movimiento (igual que Button.jsx)
+  const moveStart = useRef({ mx: 0, my: 0, x: Number(translateX) || 0, y: Number(translateY) || 0 });
+  const onMoveMouseDown = (e) => {
+    e.stopPropagation();
+    moveStart.current = {
+      mx: e.clientX,
+      my: e.clientY,
+      x: Number(translateX) || 0,
+      y: Number(translateY) || 0,
+    };
+
+    const onMove = (ev) => {
+      const dx = ev.clientX - moveStart.current.mx;
+      const dy = ev.clientY - moveStart.current.my;
+      setProp((p) => {
+        p.translateX = Math.round((moveStart.current.x ?? 0) + dx);
+        p.translateY = Math.round((moveStart.current.y ?? 0) + dy);
+      }, 0);
+    };
+
+    const onUp = () => {
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup', onUp);
+    };
+
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+  };
 
   const baseStyle = {
     width: '100%',
@@ -70,11 +102,6 @@ export const BackgroundImageContainer = ({
         ...layoutStyle,
       }}
     >
-      {/*
-        Cuando los hijos ocupan todo el espacio, es difícil seleccionar el contenedor padre.
-        Para facilitarlo en modo editor, agregamos cuatro "zonas" invisibles en los bordes
-        que permiten seleccionar/arrastrar este contenedor sin interferir con los hijos.
-      */}
       {enabled && (
         <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
           {/* Borde superior */}
@@ -103,7 +130,29 @@ export const BackgroundImageContainer = ({
           />
         </div>
       )}
+
       {children}
+
+      {selected && (
+        <>
+          {/* Handle de movimiento */}
+          <div
+            onMouseDown={onMoveMouseDown}
+            title="Arrastra para mover"
+            style={{
+              position: 'absolute',
+              left: 4,
+              top: 4,
+              width: 14,
+              height: 14,
+              borderRadius: 3,
+              cursor: 'move',
+              boxShadow: '0 0 0 1px rgba(0,0,0,0.15)',
+              background: 'rgba(0,0,0,0.15)',
+            }}
+          />
+        </>
+      )}
     </div>
   );
 };
