@@ -25,6 +25,11 @@ export const Container = ({
   gridAlignItems = 'stretch', // grid only
   // Background options
   transparentBackground = false,
+  // NUEVO: props de tamaño (opcionales)
+  width,
+  height,
+  minWidth = 100,
+  minHeight = 60,
   children 
 }) => {
   const { 
@@ -65,18 +70,57 @@ export const Container = ({
     window.addEventListener('mouseup', onUp);
   };
 
+  // NUEVO: redimensionado
+  const resizeStart = useRef({ x: 0, y: 0, w: 0, h: 0 });
+  const onResizeMouseDown = (e) => {
+    e.stopPropagation();
+    const rect = e.currentTarget.parentElement?.getBoundingClientRect();
+    resizeStart.current = {
+      x: e.clientX,
+      y: e.clientY,
+      w: typeof width === 'number' ? width : Math.round(rect?.width || Number(minWidth) || 100),
+      h: typeof height === 'number' ? height : Math.round(rect?.height || Number(minHeight) || 60),
+    };
+
+    const onMove = (ev) => {
+      const dx = ev.clientX - resizeStart.current.x;
+      const dy = ev.clientY - resizeStart.current.y;
+      const newW = Math.max(Number(minWidth) || 0, Math.round(resizeStart.current.w + dx));
+      const newH = Math.max(Number(minHeight) || 0, Math.round(resizeStart.current.h + dy));
+      setProp((p) => {
+        p.width = newW;
+        p.height = newH;
+      }, 0);
+    };
+
+    const onUp = () => {
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup', onUp);
+    };
+
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+  };
+
   const baseStyle = {
     margin: typeof margin === 'number' ? `${margin}px` : (margin || 0),
     background: transparentBackground ? 'transparent' : `${background}`,
     padding: `${Math.max(5, padding)}px`,
     borderRadius: `${borderRadius}px`,
     boxShadow: boxShadow ? `0 4px 8px ${boxShadow}` : "none",
-    width: '100%',
+    // NUEVO: tamaño (si no se especifica, conserva 100%/auto)
+    width: typeof width === 'number' ? `${width}px` : (width || '100%'),
+    height: typeof height === 'number' ? `${height}px` : (height || 'auto'),
+    minWidth: Number(minWidth) || 0,
+    minHeight: Number(minHeight) || 0,
+    boxSizing: 'border-box',
     gap: typeof gap === 'number' ? `${gap}px` : gap,
     transform: `translate(${Number(translateX) || 0}px, ${Number(translateY) || 0}px)`,
     opacity: Math.max(0, Math.min(1, Number(opacity) || 0)),
     position: 'relative',
     zIndex: Number(zIndex) || 0,
+    // Opcional: contorno al seleccionar (no afecta layout)
+    outline: selected ? '1px dashed #3b82f6' : undefined,
   };
 
   const layoutStyle = (layout === 'grid')
@@ -119,6 +163,22 @@ export const Container = ({
               height: 14,
               borderRadius: 3,
               cursor: 'move',
+              boxShadow: '0 0 0 1px rgba(0,0,0,0.15)',
+              background: 'rgba(0,0,0,0.15)',
+            }}
+          />
+          {/* NUEVO: Handle de redimensionado (esquina inferior derecha) */}
+          <div
+            onMouseDown={onResizeMouseDown}
+            title="Arrastra para redimensionar"
+            style={{
+              position: 'absolute',
+              right: 4,
+              bottom: 4,
+              width: 14,
+              height: 14,
+              borderRadius: 3,
+              cursor: 'nwse-resize',
               boxShadow: '0 0 0 1px rgba(0,0,0,0.15)',
               background: 'rgba(0,0,0,0.15)',
             }}
@@ -402,7 +462,12 @@ export const ContainerDefaultProps = {
   gridColumns: 2,
   gridJustifyItems: 'stretch',
   gridAlignItems: 'stretch',
-  transparentBackground: false
+  transparentBackground: false,
+  // NUEVO: defaults de tamaño
+  width: null,
+  height: null,
+  minWidth: 100,
+  minHeight: 60,
 };
 
 Container.craft = {
