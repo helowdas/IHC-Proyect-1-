@@ -1,19 +1,14 @@
 // components/user/Text.js
 import React, { useEffect, useState} from "react";
 import { useNode } from "@craftjs/core";
-import {Slider, FormControl, FormLabel} from "@mui/material";
 
-export const Text = ({text, fontSize}) => {
+export const Text = ({ text, fontSize, fontClass }) => {
   const { connectors: { connect, drag },hasSelectedNode, hasDraggedNode, actions: { setProp } } = useNode((state) => ({
     hasSelectedNode: state.events.selected,
     hasDraggedNode: state.events.dragged
   }));
 
   const [editable, setEditable] = useState(false);
-
-  function handleChange(e) {
-    setProp(props => props.text = e.target.value.replace(/<\/?[^>]+(>|$)/g, ""));
-  }
 
   useEffect(() => {!hasSelectedNode && setEditable(false)},[hasSelectedNode])
 
@@ -22,15 +17,14 @@ export const Text = ({text, fontSize}) => {
       ref={ref => connect(drag(ref))}
       onClick={() => setEditable(true)}
     >
-      <p style={{ fontSize }}>{text}</p>
+      <p className={fontClass || undefined} style={{ fontSize }}>{text}</p>
     </div>
   )
 }
 
 const TextSettings = () => {
-  const { actions: {setProp}, fontSize, props } = useNode((node) => ({
-    fontSize: node.data.props.fontSize,
-    props: node.data.props
+  const { actions: { setProp }, props } = useNode((node) => ({
+    props: node.data.props,
   }));
 
   return (
@@ -38,12 +32,25 @@ const TextSettings = () => {
       <div className="d-grid gap-3">
           <div>
             <label className="form-label">Texto</label>
-            <input
+            <textarea
               className="form-control form-control-sm"
-              type="text"
+              rows={3}
               value={props.text ?? ''}
-              onChange={(e) => setProp(props => props.text = e.target.value)}
+              onChange={(e) => setProp(p => p.text = e.target.value)}
+              placeholder="Escribe el contenido..."
             />
+          </div>
+          <div>
+            <label className="form-label">Tipografía</label>
+            <select
+              className="form-select form-select-sm"
+              value={props.fontClass ?? ''}
+              onChange={(e) => setProp(p => p.fontClass = e.target.value)}
+            >
+              <option value="">Predeterminada del tema</option>
+              <option value="font-amazonica">Amazonica</option>
+              <option value="font-jungle-camp">Jungle Camp</option>
+            </select>
           </div>
           <div>
             <label className="form-label">Tamaño de fuente</label>
@@ -66,7 +73,8 @@ const TextSettings = () => {
 Text.craft = {
   props: {
     text: "Texto de ejemplo",
-    fontSize: 20
+    fontSize: 20,
+    fontClass: ''
   },
   rules:{
     canDrag: (node) => node.data.props.text !== "Drag",
