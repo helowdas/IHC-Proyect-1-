@@ -17,6 +17,8 @@ export const Container = ({
   gridColumns = 2, // grid only
   gridJustifyItems = 'stretch', // grid only
   gridAlignItems = 'stretch', // grid only
+  // Background options
+  transparentBackground = false,
   children 
 }) => {
   const { connectors: { connect, drag } } = useNode();
@@ -24,8 +26,8 @@ export const Container = ({
 
   const baseStyle = {
     margin: "5px 0",
-    background: `${background}`,
-    padding: `${padding}px`,
+    background: transparentBackground ? 'transparent' : `${background}`,
+    padding: `${Math.max(5, padding)}px`,
     borderRadius: `${borderRadius}px`,
     boxShadow: boxShadow ? `0 4px 8px ${boxShadow}` : "none",
     width: '100%',
@@ -70,6 +72,18 @@ export const ContainerSettings = () => {
   return (
     <>
       <div className="d-grid gap-3">
+        <div className="form-check">
+          <input
+            id="container-bg-transparent"
+            type="checkbox"
+            className="form-check-input"
+            checked={!!props.transparentBackground}
+            onChange={(e) => setProp((p) => (p.transparentBackground = e.target.checked))}
+          />
+          <label className="form-check-label" htmlFor="container-bg-transparent">
+            Fondo transparente
+          </label>
+        </div>
         <div>
           <label className="form-label">Distribución</label>
           <select
@@ -88,6 +102,7 @@ export const ContainerSettings = () => {
             className="form-control form-control-color"
             value={props.background || '#ffffff'}
             onChange={(e) => setProp((props) => (props.background = e.target.value))}
+            disabled={!!props.transparentBackground}
           />
         </div>
 
@@ -96,12 +111,13 @@ export const ContainerSettings = () => {
           <input
             type="range"
             className="form-range"
-            min={0}
+            min={5}
             max={100}
             step={1}
-            value={typeof props.padding === 'number' ? props.padding : 3}
+            value={typeof props.padding === 'number' ? Math.max(5, props.padding) : 5}
             onChange={(e) => setProp((props) => (props.padding = Number(e.target.value)))}
           />
+          <div className="small text-muted">{Math.max(5, props.padding ?? 5)}px</div>
         </div>
         {(props.layout || 'flex') === 'flex' && (
           <>
@@ -249,7 +265,7 @@ export const ContainerSettings = () => {
 
 export const ContainerDefaultProps = {
   background: "#adb5bd",
-  padding: 3,
+  padding: 5,
   borderRadius: 0,
   boxShadow: "",
   layout: 'flex',
@@ -260,7 +276,8 @@ export const ContainerDefaultProps = {
   gap: 8,
   gridColumns: 2,
   gridJustifyItems: 'stretch',
-  gridAlignItems: 'stretch'
+  gridAlignItems: 'stretch',
+  transparentBackground: false
 };
 
 Container.craft = {

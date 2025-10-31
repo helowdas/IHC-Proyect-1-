@@ -76,14 +76,11 @@ function App({nameSection}) {
           </div>
           <div className="grow p-3" style={{ overflow: 'scroll', maxWidth: '750px' }}>
             <div className="bg-white border rounded-1 px-1" style={{ maxWidth: '100%' }}>
-              <Frame>
-                
-                  <Element is={BackgroundImageContainer} canvas>
+        <Frame>
+          <Element is={BackgroundImageContainer} padding={10} canvas>
                     
-                  </Element>
-                  <Image />
-                
-              </Frame>
+          </Element>
+        </Frame>
             </div>
           </div>
           <SelectionSidebar />
