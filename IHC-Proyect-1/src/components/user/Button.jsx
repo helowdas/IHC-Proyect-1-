@@ -3,15 +3,60 @@ import React from "react";
 import { useNode } from "@craftjs/core";
 import { useNavigate } from "react-router-dom";
 
-export const Button = ({ size = "small", variant = "contained", color = "primary", to = "", text = "Click me", className = "", children }) => {
+export const Button = ({
+  size = "small",
+  variant = "contained",
+  color = "primary",
+  // Navigation/action
+  actionType = 'route', // 'route' | 'section' | 'external'
+  to = "", // internal route (react-router)
+  sectionName = "", // for section navigation
+  externalUrl = "", // for external link
+  externalNewTab = true,
+  // Positioning
+  translateX = 0,
+  translateY = 0,
+  text = "Click me",
+  className = "",
+  children
+}) => {
   const {
     connectors: { connect, drag },
   } = useNode();
   const navigate = useNavigate();
 
-  const handleClick = () => {
-    if (to && typeof to === "string" && to.trim()) {
-      navigate(to);
+  const handleClick = (e) => {
+    e.preventDefault();
+    // Section navigation (like ChevronButton)
+    if (actionType === 'section') {
+      const target = sectionName ? `/editor?section=${encodeURIComponent(sectionName)}` : '';
+      if (!target) return;
+      if (target.startsWith('#')) {
+        const el = document.querySelector(target);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        return;
+      }
+      navigate(target);
+      return;
+    }
+    // External link
+    if (actionType === 'external') {
+      const url = (externalUrl || '').trim();
+      if (!url) return;
+      if (typeof window !== 'undefined') {
+        window.open(url, externalNewTab ? '_blank' : '_self');
+      }
+      return;
+    }
+    // Default: internal route
+    const route = (to || '').trim();
+    if (route) {
+      if (route.startsWith('#')) {
+        const el = document.querySelector(route);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        return;
+      }
+      navigate(route);
     }
   };
 
@@ -28,6 +73,7 @@ export const Button = ({ size = "small", variant = "contained", color = "primary
       ref={(ref) => connect(drag(ref))}
       type="button"
       className={`${classes} justify-content-center`}
+      style={{ transform: `translate(${Number(translateX) || 0}px, ${Number(translateY) || 0}px)` }}
       onClick={handleClick}
     >
       {text}
@@ -43,6 +89,26 @@ const ButtonSettings = () => {
   return (
     <>
       <div className="d-grid gap-3">
+        <div className="row g-2">
+          <div className="col-6">
+            <label className="form-label">Mover X (px)</label>
+            <input
+              className="form-control form-control-sm"
+              type="number"
+              value={Number.isFinite(props.translateX) ? props.translateX : 0}
+              onChange={(e) => setProp((p) => (p.translateX = Number(e.target.value)))}
+            />
+          </div>
+          <div className="col-6">
+            <label className="form-label">Mover Y (px)</label>
+            <input
+              className="form-control form-control-sm"
+              type="number"
+              value={Number.isFinite(props.translateY) ? props.translateY : 0}
+              onChange={(e) => setProp((p) => (p.translateY = Number(e.target.value)))}
+            />
+          </div>
+        </div>
         <div>
           <label className="form-label">Texto</label>
           <input
@@ -94,16 +160,68 @@ const ButtonSettings = () => {
             <option value="dark">dark</option>
           </select>
         </div>
+        <hr />
         <div>
-          <label className="form-label">URL destino (opcional)</label>
-          <input
-            className="form-control form-control-sm"
-            type="text"
-            value={props.to ?? ''}
-            onChange={(e) => setProp((props) => (props.to = e.target.value))}
-            placeholder="/ruta-o-url"
-          />
+          <label className="form-label">Acción al hacer clic</label>
+          <select
+            className="form-select form-select-sm"
+            value={props.actionType || 'route'}
+            onChange={(e) => setProp((p) => (p.actionType = e.target.value))}
+          >
+            <option value="section">Ir a sección</option>
+            <option value="external">Enlace externo</option>
+          </select>
         </div>
+        { (props.actionType || 'route') === 'route' && (
+          <div>
+            <label className="form-label">Ruta interna</label>
+            <input
+              className="form-control form-control-sm"
+              type="text"
+              value={props.to ?? ''}
+              onChange={(e) => setProp((p) => (p.to = e.target.value))}
+              placeholder="/ruta-interna o #ancla"
+            />
+          </div>
+        )}
+        { (props.actionType || 'route') === 'section' && (
+          <div>
+            <label className="form-label">Nombre de sección</label>
+            <input
+              className="form-control form-control-sm"
+              type="text"
+              value={props.sectionName ?? ''}
+              onChange={(e) => setProp((p) => (p.sectionName = e.target.value))}
+              placeholder="Landing, Home, ..."
+            />
+          </div>
+        )}
+        { (props.actionType || 'route') === 'external' && (
+          <div className="row g-2">
+            <div className="col-8">
+              <label className="form-label">URL externa</label>
+              <input
+                className="form-control form-control-sm"
+                type="text"
+                value={props.externalUrl ?? ''}
+                onChange={(e) => setProp((p) => (p.externalUrl = e.target.value))}
+                placeholder="https://..."
+              />
+            </div>
+            <div className="col-4 d-flex align-items-end">
+              <div className="form-check">
+                <input
+                  id="btn-ext-newtab"
+                  className="form-check-input"
+                  type="checkbox"
+                  checked={!!props.externalNewTab}
+                  onChange={(e) => setProp((p) => (p.externalNewTab = e.target.checked))}
+                />
+                <label className="form-check-label" htmlFor="btn-ext-newtab">Nueva pestaña</label>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </>
   )
@@ -114,8 +232,14 @@ Button.craft = {
     size: "small", 
     variant: "contained",
     color: "primary",
+    actionType: 'route',
     text: "Click me",
-    to: "", // si está vacío, no navega
+    to: "", // ruta interna o #ancla
+    sectionName: "",
+    externalUrl: "",
+    externalNewTab: true,
+    translateX: 0,
+    translateY: 0,
     className: ""
   },
 

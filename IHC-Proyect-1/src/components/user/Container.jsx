@@ -7,6 +7,9 @@ export const Container = ({
   padding = 0, 
   borderRadius = 0, 
   boxShadow = "", 
+  // Positioning
+  translateX = 0,
+  translateY = 0,
   // Layout props
   layout = 'flex', // 'flex' | 'grid'
   direction = 'column', // flex only
@@ -32,6 +35,7 @@ export const Container = ({
     boxShadow: boxShadow ? `0 4px 8px ${boxShadow}` : "none",
     width: '100%',
     gap: typeof gap === 'number' ? `${gap}px` : gap,
+    transform: `translate(${Number(translateX) || 0}px, ${Number(translateY) || 0}px)`,
   };
 
   const layoutStyle = (layout === 'grid')
@@ -72,6 +76,26 @@ export const ContainerSettings = () => {
   return (
     <>
       <div className="d-grid gap-3">
+        <div className="row g-2">
+          <div className="col-6">
+            <label className="form-label">Mover X (px)</label>
+            <input
+              type="number"
+              className="form-control form-control-sm"
+              value={Number.isFinite(props.translateX) ? props.translateX : 0}
+              onChange={(e) => setProp((p) => (p.translateX = Number(e.target.value)))}
+            />
+          </div>
+          <div className="col-6">
+            <label className="form-label">Mover Y (px)</label>
+            <input
+              type="number"
+              className="form-control form-control-sm"
+              value={Number.isFinite(props.translateY) ? props.translateY : 0}
+              onChange={(e) => setProp((p) => (p.translateY = Number(e.target.value)))}
+            />
+          </div>
+        </div>
         <div className="form-check">
           <input
             id="container-bg-transparent"
@@ -268,6 +292,8 @@ export const ContainerDefaultProps = {
   padding: 5,
   borderRadius: 0,
   boxShadow: "",
+  translateX: 0,
+  translateY: 0,
   layout: 'flex',
   direction: 'column',
   justify: 'flex-start',

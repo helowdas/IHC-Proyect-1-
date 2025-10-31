@@ -6,6 +6,9 @@ export const BackgroundImageContainer = ({
   backgroundImage = 'https://placehold.co/1200x500',
   padding = 40,
   minHeight = 200,
+  // Positioning
+  translateX = 0,
+  translateY = 0,
   // Layout props (mismas que Container)
   layout = 'flex',
   direction = 'column',
@@ -34,6 +37,7 @@ export const BackgroundImageContainer = ({
     backgroundSize: 'cover',
     backgroundPosition: 'center',
     gap: typeof gap === 'number' ? `${gap}px` : gap,
+    transform: `translate(${Number(translateX) || 0}px, ${Number(translateY) || 0}px)`,
   };
 
   const layoutStyle = (layout === 'grid')
@@ -107,6 +111,26 @@ export function BackgroundImageContainerSettings() {
 
   return (
     <div className="d-grid gap-3">
+      <div className="row g-2">
+        <div className="col-6">
+          <label className="form-label">Mover X (px)</label>
+          <input
+            type="number"
+            className="form-control form-control-sm"
+            value={Number.isFinite(props.translateX) ? props.translateX : 0}
+            onChange={(e) => setProp((p) => (p.translateX = Number(e.target.value)))}
+          />
+        </div>
+        <div className="col-6">
+          <label className="form-label">Mover Y (px)</label>
+          <input
+            type="number"
+            className="form-control form-control-sm"
+            value={Number.isFinite(props.translateY) ? props.translateY : 0}
+            onChange={(e) => setProp((p) => (p.translateY = Number(e.target.value)))}
+          />
+        </div>
+      </div>
       <div className="form-check">
         <input
           id="bgimg-transparent"
@@ -311,6 +335,8 @@ BackgroundImageContainer.craft = {
     backgroundImage: '',
     padding: 40,
     minHeight: 200,
+    translateX: 0,
+    translateY: 0,
     layout: 'flex',
     direction: 'column',
     justify: 'flex-start',

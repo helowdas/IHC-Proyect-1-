@@ -15,6 +15,9 @@ export const ChevronButton = ({
   ariaLabel,
   className = '',
   style = {},
+  // Positioning
+  translateX = 0,
+  translateY = 0,
 }) => {
   const {
     connectors: { connect, drag },
@@ -55,6 +58,7 @@ export const ChevronButton = ({
     justifyContent: 'center',
     borderRadius: rounded ? '9999px' : '8px',
     cursor: 'pointer',
+    transform: `translate(${Number(translateX) || 0}px, ${Number(translateY) || 0}px)`,
     ...style,
   };
 
@@ -97,6 +101,26 @@ const ChevronButtonSettings = () => {
 
   return (
     <div className="d-grid gap-3">
+      <div className="row g-2">
+        <div className="col-6">
+          <label className="form-label">Mover X (px)</label>
+          <input
+            className="form-control form-control-sm"
+            type="number"
+            value={Number.isFinite(props.translateX) ? props.translateX : 0}
+            onChange={(e) => setProp((p) => (p.translateX = Number(e.target.value)))}
+          />
+        </div>
+        <div className="col-6">
+          <label className="form-label">Mover Y (px)</label>
+          <input
+            className="form-control form-control-sm"
+            type="number"
+            value={Number.isFinite(props.translateY) ? props.translateY : 0}
+            onChange={(e) => setProp((p) => (p.translateY = Number(e.target.value)))}
+          />
+        </div>
+      </div>
       <div>
         <label className="form-label">Nombre de sección</label>
         <input
@@ -194,6 +218,8 @@ ChevronButton.craft = {
     ariaLabel: '',
     className: '',
     style: {},
+    translateX: 0,
+    translateY: 0,
   },
   related: {
     settings: ChevronButtonSettings,

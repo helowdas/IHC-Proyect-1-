@@ -19,7 +19,7 @@ const Sidebar = ({ items = [] }) => {
     const name = newName.trim();
     if (!name) return;
     setCreating(true);
-    const initialJson = { ROOT: { type: { resolvedName: 'Container' }, isCanvas: true, props: { padding: 5, background: '#f5f5f5' }, displayName: 'Container', custom: {}, hidden: false, nodes: [], linkedNodes: {} } };
+  const initialJson = { ROOT: { type: { resolvedName: 'BackgroundImageContainer' }, isCanvas: true, props: { padding: 10, background: '#f5f5f5' }, displayName: 'BackgroundImageContainer', custom: {}, hidden: false, nodes: [], linkedNodes: {} } };
     const result = await createSection(name, initialJson);
     if (result.ok) {
       setNewName("");

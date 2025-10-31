@@ -2,7 +2,7 @@
 import React, { useEffect, useState} from "react";
 import { useNode } from "@craftjs/core";
 
-export const Text = ({ text, fontSize, fontClass }) => {
+export const Text = ({ text, fontSize, fontClass, translateX = 0, translateY = 0 }) => {
   const { connectors: { connect, drag },hasSelectedNode, hasDraggedNode, actions: { setProp } } = useNode((state) => ({
     hasSelectedNode: state.events.selected,
     hasDraggedNode: state.events.dragged
@@ -16,6 +16,7 @@ export const Text = ({ text, fontSize, fontClass }) => {
     <div 
       ref={ref => connect(drag(ref))}
       onClick={() => setEditable(true)}
+      style={{ transform: `translate(${Number(translateX) || 0}px, ${Number(translateY) || 0}px)` }}
     >
       <p
         className={fontClass || undefined}
@@ -42,6 +43,26 @@ const TextSettings = () => {
   return (
     <>
       <div className="d-grid gap-3">
+          <div className="row g-2">
+            <div className="col-6">
+              <label className="form-label">Mover X (px)</label>
+              <input
+                className="form-control form-control-sm"
+                type="number"
+                value={Number.isFinite(props.translateX) ? props.translateX : 0}
+                onChange={(e) => setProp((p) => (p.translateX = Number(e.target.value)))}
+              />
+            </div>
+            <div className="col-6">
+              <label className="form-label">Mover Y (px)</label>
+              <input
+                className="form-control form-control-sm"
+                type="number"
+                value={Number.isFinite(props.translateY) ? props.translateY : 0}
+                onChange={(e) => setProp((p) => (p.translateY = Number(e.target.value)))}
+              />
+            </div>
+          </div>
           <div>
             <label className="form-label">Texto</label>
             <textarea
@@ -86,7 +107,9 @@ Text.craft = {
   props: {
     text: "Texto de ejemplo",
     fontSize: 20,
-    fontClass: ''
+    fontClass: '',
+    translateX: 0,
+    translateY: 0
   },
   rules:{
     canDrag: (node) => node.data.props.text !== "Drag",

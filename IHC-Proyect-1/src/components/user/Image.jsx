@@ -7,7 +7,7 @@ import {useUploadImage} from '../../hooks/useUploadImage';
 var handleFileChange;
 var uploading = false;
 
-export const Image = ({ src = 'https://placehold.co/1200x500', alt = 'Imagen', width = 100, fit = 'cover' , }) => {
+export const Image = ({ src = 'https://placehold.co/1200x500', alt = 'Imagen', width = 100, fit = 'cover', translateX = 0, translateY = 0 }) => {
 
   const { connectors: { connect, drag }, actions: {setProp} } = useNode((node) => ({
     props: node.data.props,
@@ -15,7 +15,7 @@ export const Image = ({ src = 'https://placehold.co/1200x500', alt = 'Imagen', w
 
 
   return (
-    <div ref={(ref) => connect(drag(ref))}>
+    <div ref={(ref) => connect(drag(ref))} style={{ transform: `translate(${Number(translateX) || 0}px, ${Number(translateY) || 0}px)` }}>
       <img
         src={src}
         alt={alt}
@@ -36,6 +36,26 @@ export function ImageSettings() {
   return(
     <>
     <div className="d-grid gap-3">
+        <div className="row g-2">
+          <div className="col-6">
+            <label className="form-label">Mover X (px)</label>
+            <input
+              className="form-control form-control-sm"
+              type="number"
+              value={Number.isFinite(props.translateX) ? props.translateX : 0}
+              onChange={(e) => setProp((p) => (p.translateX = Number(e.target.value)))}
+            />
+          </div>
+          <div className="col-6">
+            <label className="form-label">Mover Y (px)</label>
+            <input
+              className="form-control form-control-sm"
+              type="number"
+              value={Number.isFinite(props.translateY) ? props.translateY : 0}
+              onChange={(e) => setProp((p) => (p.translateY = Number(e.target.value)))}
+            />
+          </div>
+        </div>
         <div>
           <label className="form-label">URL de la imagen</label>
           <input
@@ -106,7 +126,7 @@ export function ImageSettings() {
 }
 
 Image.craft = {
-  props: { src: 'https://placehold.co/1200x500', alt: 'Imagen', width: 100, fit: 'cover' },
+  props: { src: 'https://placehold.co/1200x500', alt: 'Imagen', width: 100, fit: 'cover', translateX: 0, translateY: 0 },
   related:{
     settings: ImageSettings
   }
