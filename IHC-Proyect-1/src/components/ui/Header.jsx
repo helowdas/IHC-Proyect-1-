@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useEditor } from '@craftjs/core';
 import { saveSectionData } from '../../hooks/useSaveSectionData';
 
-export default function Header({ nameSection }) {
+export default function Header({ nameSection, isPreview = false, setIsPreview }) {
   const { enabled, actions, query } = useEditor((state) => ({
     enabled: state.options.enabled,
   }));
@@ -61,13 +61,35 @@ export default function Header({ nameSection }) {
       <div className="d-flex align-items-center gap-2">
         <button
           type="button"
+          className={`btn btn-outline-dark ${isPreview ? 'active' : ''}`}
+          onClick={async () => {
+            try {
+              if (!setIsPreview) return;
+              if (!isPreview) {
+                setIsPreview(true);
+                actions.setOptions((opts) => (opts.enabled = false));
+              } else {
+                setIsPreview(false);
+                actions.setOptions((opts) => (opts.enabled = true));
+              }
+            } catch (e) {
+              console.error('Error alternando vista previa', e);
+            }
+          }}
+          title={isPreview ? 'Salir de vista previa' : 'Entrar en vista previa'}
+        >
+          {isPreview ? 'Salir vista' : 'Vista previa'}
+        </button>
+        <button
+          type="button"
           className={`btn btn-outline-secondary ${enabled ? '' : 'active'}`}
           onClick={() => actions.setOptions((opts) => (opts.enabled = !enabled))}
+          disabled={isPreview}
         >
           {enabled ? 'Desactivar' : 'Activar'} editor
         </button>
 
-        <button type="button" className="btn btn-success d-flex justify-content-between align-items-center gap-2" onClick={handleSave} disabled={isSaving || !sectionName}>
+        <button type="button" className="btn btn-success d-flex justify-content-between align-items-center gap-2" onClick={handleSave} disabled={isSaving || !sectionName || isPreview}>
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-floppy-fill" viewBox="0 0 16 16">
               <path d="M0 1.5A1.5 1.5 0 0 1 1.5 0H3v5.5A1.5 1.5 0 0 0 4.5 7h7A1.5 1.5 0 0 0 13 5.5V0h.086a1.5 1.5 0 0 1 1.06.44l1.415 1.414A1.5 1.5 0 0 1 16 2.914V14.5a1.5 1.5 0 0 1-1.5 1.5H14v-5.5A1.5 1.5 0 0 0 12.5 9h-9A1.5 1.5 0 0 0 2 10.5V16h-.5A1.5 1.5 0 0 1 0 14.5z"/>
               <path d="M3 16h10v-5.5a.5.5 0 0 0-.5-.5h-9a.5.5 0 0 0-.5.5zm9-16H4v5.5a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 .5-.5zM9 1h2v4H9z"/>
@@ -75,7 +97,7 @@ export default function Header({ nameSection }) {
             {isSaving ? 'Guardando…' : 'Guardar'}
         </button>
       
-        <button type="button" className="btn btn-danger" onClick={handleClear}>
+        <button type="button" className="btn btn-danger" onClick={handleClear} disabled={isPreview}>
           Limpiar
         </button>
       </div>
