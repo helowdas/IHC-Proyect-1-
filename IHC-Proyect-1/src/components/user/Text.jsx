@@ -154,7 +154,7 @@ const TextSettings = () => {
               type="range"
               className="form-range"
               min={8}
-              max={64}
+              max={100}
               step={1}
               value={typeof props.fontSize === 'number' ? props.fontSize : 20}
               onChange={(e) => setProp(props => props.fontSize = Number(e.target.value))}
