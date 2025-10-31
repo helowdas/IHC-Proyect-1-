@@ -65,6 +65,7 @@ function App({nameSection}) {
   
   return (
     <div className="min-vh-100 d-flex flex-column bg-light">
+
       <Editor resolver={{ Card, Button, Text, Image, Container, CardTop, CardBottom, BackgroundImageContainer, ChevronButton }}>
         <Header nameSection={sectionFromQuery} />
         {/* Carga el estado inicial del editor desde Supabase según la sección */}
@@ -75,17 +76,24 @@ function App({nameSection}) {
             <Palette />
           </div>
           <div className="grow p-3" style={{ overflow: 'scroll', maxWidth: '750px' }}>
-            <div className="bg-white border rounded-1 px-1" style={{ maxWidth: '100%' }}>
-        <Frame>
-          <Element is={BackgroundImageContainer} padding={10} canvas>
-                    
-          </Element>
-        </Frame>
+
+            <div className="px-2 pt-2 pb-1 small text-muted">
+                Sección actual: <span className="fw-semibold">{sectionFromQuery || 'Sin sección'}</span>
             </div>
+
+            <div className="bg-white border rounded-1 px-1" style={{ maxWidth: '100%' }}>
+              <Frame>
+                <Element is={BackgroundImageContainer} padding={10} canvas>
+                          
+                </Element>
+              </Frame>
+            </div>
+            
           </div>
           <SelectionSidebar />
         </div>
       </Editor>
+
     </div>
   );
 }
