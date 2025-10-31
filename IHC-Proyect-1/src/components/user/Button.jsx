@@ -7,6 +7,10 @@ export const Button = ({
   size = "small",
   variant = "contained",
   color = "primary",
+  // Custom colors
+  buttonTextColor = '',
+  buttonBgColor = '',
+  buttonBorderColor = '',
   // Navigation/action
   actionType = 'route', // 'route' | 'section' | 'external'
   to = "", // internal route (react-router)
@@ -65,16 +69,46 @@ export const Button = ({
   const colorToken = (color || "primary").toLowerCase();
   const isOutline = variant === "outlined";
   const isLink = variant === "text";
-  const base = isLink ? "btn btn-link" : `btn ${isOutline ? "btn-outline-" : "btn-"}${colorToken}`;
+  const hasCustomColors = !!(buttonTextColor || buttonBgColor || buttonBorderColor);
+  const base = hasCustomColors
+    ? "btn" // usamos estilo base y aplicamos colores personalizados por inline style
+    : (isLink ? "btn btn-link" : `btn ${isOutline ? "btn-outline-" : "btn-"}${colorToken}`);
   const sizeCls = size === "large" ? "btn-lg" : size === "small" ? "btn-sm" : ""; // medium => default
   const classes = [base, sizeCls, className].filter(Boolean).join(" ");
+
+  const computedStyle = {
+    transform: `translate(${Number(translateX) || 0}px, ${Number(translateY) || 0}px)`,
+    opacity: Math.max(0, Math.min(1, Number(opacity) || 0))
+  };
+
+  if (hasCustomColors) {
+    if (isLink) {
+      computedStyle.backgroundColor = 'transparent';
+      if (buttonTextColor) computedStyle.color = buttonTextColor;
+      computedStyle.border = 'none';
+    } else if (isOutline) {
+      computedStyle.backgroundColor = 'transparent';
+      if (buttonTextColor) computedStyle.color = buttonTextColor;
+      computedStyle.borderStyle = 'solid';
+      computedStyle.borderWidth = 1;
+      if (buttonBorderColor) computedStyle.borderColor = buttonBorderColor;
+      else if (buttonTextColor) computedStyle.borderColor = buttonTextColor;
+    } else {
+      if (buttonBgColor) computedStyle.backgroundColor = buttonBgColor;
+      if (buttonTextColor) computedStyle.color = buttonTextColor;
+      computedStyle.borderStyle = 'solid';
+      computedStyle.borderWidth = 1;
+      if (buttonBorderColor) computedStyle.borderColor = buttonBorderColor;
+      else if (buttonBgColor) computedStyle.borderColor = buttonBgColor;
+    }
+  }
 
   return (
     <button
       ref={(ref) => connect(drag(ref))}
       type="button"
       className={`${classes} justify-content-center`}
-      style={{ transform: `translate(${Number(translateX) || 0}px, ${Number(translateY) || 0}px)`, opacity: Math.max(0, Math.min(1, Number(opacity) || 0)) }}
+      style={computedStyle}
       onClick={handleClick}
     >
       {text}
@@ -107,6 +141,35 @@ const ButtonSettings = () => {
               type="number"
               value={Number.isFinite(props.translateY) ? props.translateY : 0}
               onChange={(e) => setProp((p) => (p.translateY = Number(e.target.value)))}
+            />
+          </div>
+        </div>
+        <div className="row g-2">
+          <div className="col-4">
+            <label className="form-label">Color texto</label>
+            <input
+              type="color"
+              className="form-control form-control-color"
+              value={props.buttonTextColor || ''}
+              onChange={(e) => setProp((p) => (p.buttonTextColor = e.target.value))}
+            />
+          </div>
+          <div className="col-4">
+            <label className="form-label">Color fondo</label>
+            <input
+              type="color"
+              className="form-control form-control-color"
+              value={props.buttonBgColor || ''}
+              onChange={(e) => setProp((p) => (p.buttonBgColor = e.target.value))}
+            />
+          </div>
+          <div className="col-4">
+            <label className="form-label">Color borde</label>
+            <input
+              type="color"
+              className="form-control form-control-color"
+              value={props.buttonBorderColor || ''}
+              onChange={(e) => setProp((p) => (p.buttonBorderColor = e.target.value))}
             />
           </div>
         </div>
@@ -233,6 +296,9 @@ Button.craft = {
     size: "small", 
     variant: "contained",
     color: "primary",
+    buttonTextColor: '',
+    buttonBgColor: '',
+    buttonBorderColor: '',
     actionType: 'route',
     text: "Click me",
     to: "", // ruta interna o #ancla
