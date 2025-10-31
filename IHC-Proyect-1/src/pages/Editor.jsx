@@ -74,16 +74,15 @@ function App({nameSection}) {
           <div className="d-flex flex-column">
             <Palette />
           </div>
-          <div className="grow p-3" style={{ overflow: 'auto' }}>
-            <div className="bg-white border rounded-1 px-1">
+          <div className="grow p-3" style={{ overflow: 'scroll', maxWidth: '750px' }}>
+            <div className="bg-white border rounded-1 px-1" style={{ maxWidth: '100%' }}>
               <Frame>
-                <Element is={Container} padding={8} background="#ffffff" canvas>
-                  {/* Ejemplo de contenido inicial */}
+                
                   <Element is={BackgroundImageContainer} canvas>
                     
                   </Element>
                   <Image />
-                </Element>
+                
               </Frame>
             </div>
           </div>
