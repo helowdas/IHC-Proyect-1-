@@ -236,18 +236,6 @@ const ButtonSettings = () => {
             <option value="external">Enlace externo</option>
           </select>
         </div>
-        { (props.actionType || 'route') === 'route' && (
-          <div>
-            <label className="form-label">Ruta interna</label>
-            <input
-              className="form-control form-control-sm"
-              type="text"
-              value={props.to ?? ''}
-              onChange={(e) => setProp((p) => (p.to = e.target.value))}
-              placeholder="/ruta-interna o #ancla"
-            />
-          </div>
-        )}
         { (props.actionType || 'route') === 'section' && (
           <div>
             <label className="form-label">Nombre de sección</label>
