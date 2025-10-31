@@ -17,7 +17,17 @@ export const Text = ({ text, fontSize, fontClass }) => {
       ref={ref => connect(drag(ref))}
       onClick={() => setEditable(true)}
     >
-      <p className={fontClass || undefined} style={{ fontSize }}>{text}</p>
+      <p
+        className={fontClass || undefined}
+        style={{
+          fontSize,
+          whiteSpace: 'pre-wrap',      // respeta saltos de línea del textarea
+          overflowWrap: 'anywhere',    // rompe palabras/largas sin espacios
+          wordBreak: 'break-word',     // fallback para navegadores más viejos
+        }}
+      >
+        {text}
+      </p>
     </div>
   )
 }
