@@ -13,6 +13,7 @@ const Sidebar = ({ items = [] }) => {
   const isEditorActive = pathname === "/editor";
   const [newName, setNewName] = useState("");
   const [creating, setCreating] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const handleCreate = async (e) => {
     e.preventDefault();
@@ -32,6 +33,10 @@ const Sidebar = ({ items = [] }) => {
     }
     setCreating(false);
   };
+
+  const filteredNames = names.filter((name) =>
+    name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <aside className="w-64 p-1 overflow-hidden">
@@ -65,6 +70,16 @@ const Sidebar = ({ items = [] }) => {
             </button>
           </form>
 
+          {/* Buscador de secciones */}
+          <input
+            type="text"
+            className="form-control form-control-sm mb-3"
+            placeholder="Buscar sección..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            aria-label="Buscar sección"
+          />
+
           {error && (
             <div className="alert alert-danger p-2" role="alert">
               No se pudieron cargar las secciones.
@@ -75,7 +90,7 @@ const Sidebar = ({ items = [] }) => {
             <div className="text-muted small">No hay secciones.</div>
           )}
 
-          {names.map((name) => {
+          {filteredNames.map((name) => {
             const isActive = isEditorActive && currentSection === name;
             const onDelete = async () => {
               if (!confirm(`¿Eliminar la sección "${name}"? Esta acción no se puede deshacer.`)) return;

@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
-import Home from './pages/Home.jsx';
 import Editor from './pages/Editor.jsx';
 
 // Vista simple para placeholders
@@ -38,7 +37,6 @@ export default function App() {
           <Route path="/" element={<Navigate to="/editor" replace />} />
 
           {/* Rutas principales */}
-          <Route path="/home" element={<Home />} />
           <Route path="/editor" element={<Editor nameSection={"editor"}/>} />
 
           {/* Rutas del Sidebar usando renderizado condicional por ruta */}
