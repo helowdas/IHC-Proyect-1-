@@ -6,6 +6,7 @@ import { Text } from '../user/Text';
 import { Image } from '../user/Image';
 import { Card } from '../user/Card';
 import { ChevronButton } from '../user/ChevronButton';
+import {BackgroundImageContainer} from "../user/ImageContainer";
 import Sidebar from "./Sidebar";
 
 export default function Palette() {
@@ -78,6 +79,14 @@ export default function Palette() {
               type="button"
             >
               <span className="bi bi-square"></span> Contenedor
+            </button>
+
+            <button
+              ref={(ref) => ref && connectors.create(ref, <Element is={BackgroundImageContainer} padding={16} background="#ffffff" canvas />)}
+              className="btn btn-light d-flex align-items-center gap-2 text-start"
+              type="button"
+            >
+              <span className="bi bi-square"></span> Contenedor Imagen
             </button>
 
             <button

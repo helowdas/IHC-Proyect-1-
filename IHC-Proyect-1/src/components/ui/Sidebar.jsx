@@ -45,7 +45,7 @@ const Sidebar = ({ items = [] }) => {
               onClick={refetch}
               disabled={loading}
             >
-              <i class="bi bi-arrow-clockwise"></i>
+              <i className="bi bi-arrow-clockwise"></i>
             </button>
           </div>
 
