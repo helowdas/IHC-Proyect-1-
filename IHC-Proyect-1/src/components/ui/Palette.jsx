@@ -5,6 +5,7 @@ import { Button } from '../user/Button';
 import { Text } from '../user/Text';
 import { Image } from '../user/Image';
 import { Card } from '../user/Card';
+import { ChevronButton } from '../user/ChevronButton';
 import Sidebar from "./Sidebar";
 
 export default function Palette() {
@@ -53,6 +54,14 @@ export default function Palette() {
               type="button"
             >
               <span className="bi bi-lightning"></span> Botón
+            </button>
+
+            <button
+              ref={(ref) => ref && connectors.create(ref, <ChevronButton direction="left" color="#E6E3A1" />)}
+              className="btn btn-light d-flex align-items-center gap-2 text-start"
+              type="button"
+            >
+              <span className="bi bi-chevron-left"></span> Boton de Navegacion
             </button>
 
             <button
