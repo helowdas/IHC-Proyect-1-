@@ -17,6 +17,7 @@ export const Button = ({
   translateX = 0,
   translateY = 0,
   text = "Click me",
+  opacity = 1,
   className = "",
   children
 }) => {
@@ -73,7 +74,7 @@ export const Button = ({
       ref={(ref) => connect(drag(ref))}
       type="button"
       className={`${classes} justify-content-center`}
-      style={{ transform: `translate(${Number(translateX) || 0}px, ${Number(translateY) || 0}px)` }}
+      style={{ transform: `translate(${Number(translateX) || 0}px, ${Number(translateY) || 0}px)`, opacity: Math.max(0, Math.min(1, Number(opacity) || 0)) }}
       onClick={handleClick}
     >
       {text}
@@ -240,6 +241,7 @@ Button.craft = {
     externalNewTab: true,
     translateX: 0,
     translateY: 0,
+      opacity: 1,
     className: ""
   },
 

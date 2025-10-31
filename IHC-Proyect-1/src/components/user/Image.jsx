@@ -7,7 +7,7 @@ import {useUploadImage} from '../../hooks/useUploadImage';
 var handleFileChange;
 var uploading = false;
 
-export const Image = ({ src = 'https://placehold.co/1200x500', alt = 'Imagen', width = 100, fit = 'cover', translateX = 0, translateY = 0 }) => {
+export const Image = ({ src = 'https://placehold.co/1200x500', alt = 'Imagen', width = 100, fit = 'cover', translateX = 0, translateY = 0, opacity = 1 }) => {
 
   const { connectors: { connect, drag }, actions: {setProp} } = useNode((node) => ({
     props: node.data.props,
@@ -15,7 +15,7 @@ export const Image = ({ src = 'https://placehold.co/1200x500', alt = 'Imagen', w
 
 
   return (
-    <div ref={(ref) => connect(drag(ref))} style={{ transform: `translate(${Number(translateX) || 0}px, ${Number(translateY) || 0}px)` }}>
+    <div ref={(ref) => connect(drag(ref))} style={{ transform: `translate(${Number(translateX) || 0}px, ${Number(translateY) || 0}px)`, opacity: Math.max(0, Math.min(1, Number(opacity) || 0)) }}>
       <img
         src={src}
         alt={alt}
@@ -36,6 +36,19 @@ export function ImageSettings() {
   return(
     <>
     <div className="d-grid gap-3">
+        <div>
+          <label className="form-label">Opacidad</label>
+          <input
+            className="form-range"
+            type="range"
+            min={0}
+            max={1}
+            step={0.05}
+            value={Number.isFinite(props.opacity) ? props.opacity : 1}
+            onChange={(e) => setProp((p) => (p.opacity = Number(e.target.value)))}
+          />
+          <div className="small text-muted">{(props.opacity ?? 1).toFixed(2)}</div>
+        </div>
         <div className="row g-2">
           <div className="col-6">
             <label className="form-label">Mover X (px)</label>
@@ -126,7 +139,7 @@ export function ImageSettings() {
 }
 
 Image.craft = {
-  props: { src: 'https://placehold.co/1200x500', alt: 'Imagen', width: 100, fit: 'cover', translateX: 0, translateY: 0 },
+  props: { src: 'https://placehold.co/1200x500', alt: 'Imagen', width: 100, fit: 'cover', translateX: 0, translateY: 0, opacity: 1 },
   related:{
     settings: ImageSettings
   }

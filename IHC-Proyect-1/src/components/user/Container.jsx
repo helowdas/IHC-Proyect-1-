@@ -10,6 +10,8 @@ export const Container = ({
   // Positioning
   translateX = 0,
   translateY = 0,
+  margin = 5,
+  opacity = 1,
   // Layout props
   layout = 'flex', // 'flex' | 'grid'
   direction = 'column', // flex only
@@ -28,7 +30,7 @@ export const Container = ({
   const textAlign = align === 'center' ? 'center' : (align === 'flex-end' ? 'right' : 'left');
 
   const baseStyle = {
-    margin: "5px 0",
+    margin: typeof margin === 'number' ? `${margin}px` : (margin || 0),
     background: transparentBackground ? 'transparent' : `${background}`,
     padding: `${Math.max(5, padding)}px`,
     borderRadius: `${borderRadius}px`,
@@ -36,6 +38,7 @@ export const Container = ({
     width: '100%',
     gap: typeof gap === 'number' ? `${gap}px` : gap,
     transform: `translate(${Number(translateX) || 0}px, ${Number(translateY) || 0}px)`,
+    opacity: Math.max(0, Math.min(1, Number(opacity) || 0)),
   };
 
   const layoutStyle = (layout === 'grid')
@@ -76,6 +79,32 @@ export const ContainerSettings = () => {
   return (
     <>
       <div className="d-grid gap-3">
+        <div>
+          <label className="form-label">Opacidad</label>
+          <input
+            type="range"
+            className="form-range"
+            min={0}
+            max={1}
+            step={0.05}
+            value={Number.isFinite(props.opacity) ? props.opacity : 1}
+            onChange={(e) => setProp((p) => (p.opacity = Number(e.target.value)))}
+          />
+          <div className="small text-muted">{(props.opacity ?? 1).toFixed(2)}</div>
+        </div>
+        <div>
+          <label className="form-label">Margen (px)</label>
+          <input
+            type="range"
+            className="form-range"
+            min={0}
+            max={64}
+            step={1}
+            value={typeof props.margin === 'number' ? props.margin : 5}
+            onChange={(e) => setProp((p) => (p.margin = Number(e.target.value)))}
+          />
+          <div className="small text-muted">{props.margin ?? 5}px</div>
+        </div>
         <div className="row g-2">
           <div className="col-6">
             <label className="form-label">Mover X (px)</label>
@@ -294,6 +323,8 @@ export const ContainerDefaultProps = {
   boxShadow: "",
   translateX: 0,
   translateY: 0,
+  margin: 5,
+  opacity: 1,
   layout: 'flex',
   direction: 'column',
   justify: 'flex-start',

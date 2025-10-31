@@ -18,6 +18,7 @@ export const ChevronButton = ({
   // Positioning
   translateX = 0,
   translateY = 0,
+  opacity = 1,
 }) => {
   const {
     connectors: { connect, drag },
@@ -59,6 +60,7 @@ export const ChevronButton = ({
     borderRadius: rounded ? '9999px' : '8px',
     cursor: 'pointer',
     transform: `translate(${Number(translateX) || 0}px, ${Number(translateY) || 0}px)`,
+    opacity: Math.max(0, Math.min(1, Number(opacity) || 0)),
     ...style,
   };
 
@@ -101,6 +103,19 @@ const ChevronButtonSettings = () => {
 
   return (
     <div className="d-grid gap-3">
+      <div>
+        <label className="form-label">Opacidad</label>
+        <input
+          className="form-range"
+          type="range"
+          min={0}
+          max={1}
+          step={0.05}
+          value={Number.isFinite(props.opacity) ? props.opacity : 1}
+          onChange={(e) => setProp((p) => (p.opacity = Number(e.target.value)))}
+        />
+        <div className="small text-muted">{(props.opacity ?? 1).toFixed(2)}</div>
+      </div>
       <div className="row g-2">
         <div className="col-6">
           <label className="form-label">Mover X (px)</label>
@@ -220,6 +235,7 @@ ChevronButton.craft = {
     style: {},
     translateX: 0,
     translateY: 0,
+    opacity: 1,
   },
   related: {
     settings: ChevronButtonSettings,
