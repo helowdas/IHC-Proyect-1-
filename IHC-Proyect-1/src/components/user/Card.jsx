@@ -45,7 +45,10 @@ export const Card = ({
   width = 360,
   height = 220,
   minWidth = 180,
-  minHeight = 120
+  minHeight = 120,
+  // NUEVO: posición libre
+  x = 0,
+  y = 0,
 }) => {
   const {
     connectors: { connect, drag },
@@ -56,6 +59,8 @@ export const Card = ({
   }));
 
   const start = useRef({ x: 0, y: 0, w: width, h: height });
+  // Asegura números desde el inicio (evita concatenaciones con strings como "10px")
+  const moveStart = useRef({ mx: 0, my: 0, x: Number(x) || 0, y: Number(y) || 0 });
 
   const onResizeMouseDown = (e) => {
     e.stopPropagation();
@@ -86,11 +91,44 @@ export const Card = ({
     window.addEventListener('mouseup', onUp);
   };
 
+  // NUEVO: movimiento libre en X/Y
+  const onMoveMouseDown = (e) => {
+    e.stopPropagation();
+    // Lee los valores actuales como números al comenzar el drag
+    moveStart.current = {
+      mx: e.clientX,
+      my: e.clientY,
+      x: Number(x) || 0,
+      y: Number(y) || 0,
+    };
+
+    const onMove = (ev) => {
+      const dx = ev.clientX - moveStart.current.mx;
+      const dy = ev.clientY - moveStart.current.my;
+      setProp((props) => {
+        props.x = Math.round((moveStart.current.x ?? 0) + dx);
+        props.y = Math.round((moveStart.current.y ?? 0) + dy);
+      }, 0);
+    };
+
+    const onUp = () => {
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup', onUp);
+    };
+
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+  };
+
   return (
     <div
       ref={(ref) => ref && connect(drag(ref))}
       style={{
-        position: 'relative',
+        // Posicionamiento libre
+        position: 'absolute',
+        left: typeof x === 'number' ? `${x}px` : x,
+        top: typeof y === 'number' ? `${y}px` : y,
+
         width: typeof width === 'number' ? `${width}px` : width,
         height: typeof height === 'number' ? `${height}px` : height,
         minWidth,
@@ -108,24 +146,24 @@ export const Card = ({
       </Container>
 
       {selected && (
-        <div
-          onMouseDown={onResizeMouseDown}
-          title="Arrastra para redimensionar"
-          style={{
-            position: 'absolute',
-            right: 4,
-            bottom: 4,
-            width: 14,
-            height: 14,
-            color: '#666',
-            borderRadius: 3,
-            border: '20px #black',
-            backgroundColor: 'rgba(0,0,0,0.1)',
-            cursor: 'nwse-resize',
-            boxShadow: '0 0 0 1px rgba(0,0,0,0.1)',
-            
-          }}
-        />
+        <>
+          {/* Handle de movimiento */}
+          <div
+            onMouseDown={onMoveMouseDown}
+            title="Arrastra para mover"
+            style={{
+              position: 'absolute',
+              left: 4,
+              top: 4,
+              width: 14,
+              height: 14,
+              borderRadius: 3,
+              cursor: 'move',
+              boxShadow: '0 0 0 1px rgba(0,0,0,0.15)',
+              background: 'rgba(0,0,0,0.15)',
+            }}
+          />
+        </>
       )}
     </div>
   )
@@ -138,9 +176,11 @@ Card.craft = {
     height: 220,
     minWidth: 180,
     minHeight: 120,
+    // NUEVO: defaults posición
+    x: 0,
+    y: 0,
   },
   related: {
-    // Reusa settings del Container
     settings: ContainerSettings
   }
 }
