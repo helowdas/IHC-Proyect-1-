@@ -32,6 +32,8 @@ export const Text = ({ text, fontSize, fontClass }) => {
   )
 }
 
+
+
 const TextSettings = () => {
   const { actions: { setProp }, props } = useNode((node) => ({
     props: node.data.props,
