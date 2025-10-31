@@ -2,7 +2,7 @@
 import React, { useEffect, useState} from "react";
 import { useNode } from "@craftjs/core";
 
-export const Text = ({ text, fontSize, fontClass, translateX = 0, translateY = 0, zIndex = 0, opacity = 1, textColor = '#000000', textShadowX = 0, textShadowY = 0, textShadowBlur = 0, textShadowColor = '#000000' }) => {
+export const Text = ({ text, fontSize, fontClass, translateX = 0, translateY = 0, zIndex = 0, opacity = 1, textColor = '#000000', textShadowX = 0, textShadowY = 0, textShadowBlur = 0, textShadowColor = '#000000', textAlign = 'left', lineHeight = 1.5 }) => {
   const { connectors: { connect, drag },hasSelectedNode, hasDraggedNode, actions: { setProp } } = useNode((state) => ({
     hasSelectedNode: state.events.selected,
     hasDraggedNode: state.events.dragged
@@ -23,6 +23,8 @@ export const Text = ({ text, fontSize, fontClass, translateX = 0, translateY = 0
         style={{
           fontSize,
           color: textColor || '#000000',
+          textAlign: textAlign || 'left',
+          lineHeight: (typeof lineHeight === 'number' && Number.isFinite(lineHeight)) ? lineHeight : (parseFloat(lineHeight) || 1.5),
           textShadow: `${Number(textShadowX) || 0}px ${Number(textShadowY) || 0}px ${Number(textShadowBlur) || 0}px ${textShadowColor || '#000000'}`,
           whiteSpace: 'pre-wrap',      // respeta saltos de línea del textarea
           overflowWrap: 'anywhere',    // rompe palabras/largas sin espacios
@@ -170,6 +172,32 @@ const TextSettings = () => {
             />
             <div className="small text-muted">{props.fontSize ?? 20}px</div>
           </div>
+          <div>
+            <label className="form-label">Alineación de texto</label>
+            <select
+              className="form-select form-select-sm"
+              value={props.textAlign || 'left'}
+              onChange={(e) => setProp((p) => (p.textAlign = e.target.value))}
+            >
+              <option value="left">Izquierda</option>
+              <option value="center">Centro</option>
+              <option value="right">Derecha</option>
+              <option value="justify">Justificado</option>
+            </select>
+          </div>
+          <div>
+            <label className="form-label">Interlineado</label>
+            <input
+              type="range"
+              className="form-range"
+              min={0.8}
+              max={3}
+              step={0.1}
+              value={Number.isFinite(props.lineHeight) ? props.lineHeight : 1.5}
+              onChange={(e) => setProp((p) => (p.lineHeight = Number(e.target.value)))}
+            />
+            <div className="small text-muted">{(Number.isFinite(props.lineHeight) ? props.lineHeight : 1.5).toFixed(1)}x</div>
+          </div>
         </div>
     </>
   )
@@ -188,7 +216,9 @@ Text.craft = {
     textShadowX: 0,
     textShadowY: 0,
     textShadowBlur: 0,
-    textShadowColor: '#000000'
+    textShadowColor: '#000000',
+    textAlign: 'left',
+    lineHeight: 1.5
   },
   rules:{
     canDrag: (node) => node.data.props.text !== "Drag",
