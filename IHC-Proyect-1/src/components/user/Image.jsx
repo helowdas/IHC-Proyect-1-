@@ -15,6 +15,7 @@ export const Image = ({
   fit = 'cover',
   translateX = 0,
   translateY = 0,
+  zIndex = 0,
   opacity = 1,
   // Click behavior like Button
   actionType = 'route', // 'route' | 'section' | 'external'
@@ -74,6 +75,8 @@ export const Image = ({
       style={{
         transform: `translate(${Number(translateX) || 0}px, ${Number(translateY) || 0}px)`,
         opacity: Math.max(0, Math.min(1, Number(opacity) || 0)),
+        position: 'relative',
+        zIndex: Number(zIndex) || 0,
         cursor: actionable ? 'pointer' : 'default',
       }}
       onClick={handleClick}
@@ -110,6 +113,15 @@ export function ImageSettings() {
             onChange={(e) => setProp((p) => (p.opacity = Number(e.target.value)))}
           />
           <div className="small text-muted">{(props.opacity ?? 1).toFixed(2)}</div>
+        </div>
+        <div>
+          <label className="form-label">Z-index</label>
+          <input
+            className="form-control form-control-sm"
+            type="number"
+            value={Number.isFinite(props.zIndex) ? props.zIndex : 0}
+            onChange={(e) => setProp((p) => (p.zIndex = Number(e.target.value)))}
+          />
         </div>
         <div className="row g-2">
           <div className="col-6">
@@ -258,6 +270,7 @@ Image.craft = {
     fit: 'cover',
     translateX: 0,
     translateY: 0,
+    zIndex: 0,
     opacity: 1,
     actionType: 'route',
     to: '',

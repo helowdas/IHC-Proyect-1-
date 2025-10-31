@@ -9,6 +9,7 @@ export const BackgroundImageContainer = ({
   // Positioning
   translateX = 0,
   translateY = 0,
+  zIndex = 0,
   margin = 5,
   opacity = 1,
   // Layout props (mismas que Container)
@@ -42,6 +43,7 @@ export const BackgroundImageContainer = ({
     transform: `translate(${Number(translateX) || 0}px, ${Number(translateY) || 0}px)`,
     margin: typeof margin === 'number' ? `${margin}px` : (margin || 0),
     opacity: Math.max(0, Math.min(1, Number(opacity) || 0)),
+    zIndex: Number(zIndex) || 0,
   };
 
   const layoutStyle = (layout === 'grid')
@@ -127,6 +129,15 @@ export function BackgroundImageContainerSettings() {
           onChange={(e) => setProp((p) => (p.opacity = Number(e.target.value)))}
         />
         <div className="small text-muted">{(props.opacity ?? 1).toFixed(2)}</div>
+      </div>
+      <div>
+        <label className="form-label">Z-index</label>
+        <input
+          type="number"
+          className="form-control form-control-sm"
+          value={Number.isFinite(props.zIndex) ? props.zIndex : 0}
+          onChange={(e) => setProp((p) => (p.zIndex = Number(e.target.value)))}
+        />
       </div>
       <div>
         <label className="form-label">Margen (px)</label>
@@ -367,6 +378,7 @@ BackgroundImageContainer.craft = {
     minHeight: 200,
     translateX: 0,
     translateY: 0,
+    zIndex: 0,
     margin: 5,
     opacity: 1,
     layout: 'flex',

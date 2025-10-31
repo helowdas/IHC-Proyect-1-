@@ -2,7 +2,7 @@
 import React, { useEffect, useState} from "react";
 import { useNode } from "@craftjs/core";
 
-export const Text = ({ text, fontSize, fontClass, translateX = 0, translateY = 0, opacity = 1, textColor = '#000000', textShadowX = 0, textShadowY = 0, textShadowBlur = 0, textShadowColor = '#000000' }) => {
+export const Text = ({ text, fontSize, fontClass, translateX = 0, translateY = 0, zIndex = 0, opacity = 1, textColor = '#000000', textShadowX = 0, textShadowY = 0, textShadowBlur = 0, textShadowColor = '#000000' }) => {
   const { connectors: { connect, drag },hasSelectedNode, hasDraggedNode, actions: { setProp } } = useNode((state) => ({
     hasSelectedNode: state.events.selected,
     hasDraggedNode: state.events.dragged
@@ -16,7 +16,7 @@ export const Text = ({ text, fontSize, fontClass, translateX = 0, translateY = 0
     <div 
       ref={ref => connect(drag(ref))}
       onClick={() => setEditable(true)}
-      style={{ transform: `translate(${Number(translateX) || 0}px, ${Number(translateY) || 0}px)`, opacity: Math.max(0, Math.min(1, Number(opacity) || 0)) }}
+      style={{ transform: `translate(${Number(translateX) || 0}px, ${Number(translateY) || 0}px)`, opacity: Math.max(0, Math.min(1, Number(opacity) || 0)), position: 'relative', zIndex: Number(zIndex) || 0 }}
     >
       <p
         className={fontClass || undefined}
@@ -45,6 +45,15 @@ const TextSettings = () => {
   return (
     <>
       <div className="d-grid gap-3">
+          <div>
+            <label className="form-label">Z-index</label>
+            <input
+              className="form-control form-control-sm"
+              type="number"
+              value={Number.isFinite(props.zIndex) ? props.zIndex : 0}
+              onChange={(e) => setProp((p) => (p.zIndex = Number(e.target.value)))}
+            />
+          </div>
           <div>
             <label className="form-label">Opacidad</label>
             <input
@@ -173,6 +182,7 @@ Text.craft = {
     fontClass: '',
     translateX: 0,
     translateY: 0,
+    zIndex: 0,
     opacity: 1,
     textColor: '#000000',
     textShadowX: 0,
