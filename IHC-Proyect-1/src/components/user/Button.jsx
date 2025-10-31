@@ -20,6 +20,7 @@ export const Button = ({
   // Positioning
   translateX = 0,
   translateY = 0,
+  zIndex = 0,
   text = "Click me",
   opacity = 1,
   className = "",
@@ -78,7 +79,9 @@ export const Button = ({
 
   const computedStyle = {
     transform: `translate(${Number(translateX) || 0}px, ${Number(translateY) || 0}px)`,
-    opacity: Math.max(0, Math.min(1, Number(opacity) || 0))
+    opacity: Math.max(0, Math.min(1, Number(opacity) || 0)),
+    position: 'relative',
+    zIndex: Number(zIndex) || 0
   };
 
   if (hasCustomColors) {
@@ -143,6 +146,15 @@ const ButtonSettings = () => {
               onChange={(e) => setProp((p) => (p.translateY = Number(e.target.value)))}
             />
           </div>
+        </div>
+        <div>
+          <label className="form-label">Z-index</label>
+          <input
+            className="form-control form-control-sm"
+            type="number"
+            value={Number.isFinite(props.zIndex) ? props.zIndex : 0}
+            onChange={(e) => setProp((p) => (p.zIndex = Number(e.target.value)))}
+          />
         </div>
         <div className="row g-2">
           <div className="col-4">
@@ -295,6 +307,7 @@ Button.craft = {
     externalNewTab: true,
     translateX: 0,
     translateY: 0,
+    zIndex: 0,
       opacity: 1,
     className: ""
   },
