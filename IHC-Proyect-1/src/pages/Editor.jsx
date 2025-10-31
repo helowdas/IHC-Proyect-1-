@@ -10,7 +10,6 @@ import { Card } from '../components/user/Card';
 import { Text } from '../components/user/Text';
 import { Image } from '../components/user/Image';
 import { CardBottom, CardTop } from '../components/user/Card';
-import { BackgroundImageContainer } from '../components/user/ImageContainer';
 
 import { Editor, Frame, Element, useEditor } from '@craftjs/core';
 import { useSearchParams } from 'react-router-dom';
@@ -64,7 +63,7 @@ function App({nameSection}) {
   
   return (
     <div className="min-vh-100 d-flex flex-column bg-light">
-      <Editor resolver={{ Card, Button, Text, Image, Container, CardTop, CardBottom, BackgroundImageContainer }}>
+      <Editor resolver={{ Card, Button, Text, Image, Container, CardTop, CardBottom }}>
         <Header nameSection={sectionFromQuery} />
         {/* Carga el estado inicial del editor desde Supabase según la sección */}
         <SectionDataLoader sectionName={sectionFromQuery} />
