@@ -49,6 +49,8 @@ export const Card = ({
   // NUEVO: posición libre
   x = 0,
   y = 0,
+  // Z-index para evitar desplazamiento
+  zIndex = 0,
 }) => {
   const {
     connectors: { connect, drag },
@@ -66,6 +68,7 @@ export const Card = ({
         position: 'absolute',
         left: typeof x === 'number' ? `${x}px` : x,
         top: typeof y === 'number' ? `${y}px` : y,
+        zIndex: Number(zIndex) || 0,
 
         width: typeof width === 'number' ? `${width}px` : width,
         height: typeof height === 'number' ? `${height}px` : height,
@@ -101,6 +104,8 @@ Card.craft = {
     // NUEVO: defaults posición
     x: 0,
     y: 0,
+    // Z-index para evitar desplazamiento
+    zIndex: 0,
   },
   related: {
     settings: ContainerSettings
