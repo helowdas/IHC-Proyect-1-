@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import Header from '../components/ui/Header';
 import Palette from '../components/ui/Palette';
 import Sidebar from '../components/ui/Sidebar';
@@ -62,22 +62,19 @@ function SelectionSidebar() {
 function App({nameSection}) {
   const [searchParams] = useSearchParams();
   const sectionFromQuery = searchParams.get('section') || nameSection;
-  const [isPreview, setIsPreview] = useState(false);
   
   return (
     <div className="min-vh-100 d-flex flex-column bg-light">
 
       <Editor resolver={{ Card, Button, Text, Image, Container, CardTop, CardBottom, BackgroundImageContainer, ChevronButton }}>
-        <Header nameSection={sectionFromQuery} isPreview={isPreview} setIsPreview={setIsPreview} />
+        <Header nameSection={sectionFromQuery} />
         {/* Carga el estado inicial del editor desde Supabase según la sección */}
         <SectionDataLoader sectionName={sectionFromQuery} />
         <div className="d-flex grow" style={{ minHeight: 0 }}>
           {/* Columna izquierda: Sidebar encima de la paleta de componentes */}
-          {!isPreview && (
-            <div className="d-flex flex-column">
-              <Palette />
-            </div>
-          )}
+          <div className="d-flex flex-column">
+            <Palette />
+          </div>
           <div className="grow p-3" style={{ overflow: 'scroll', maxWidth: '750px' }}>
 
             <div className="px-2 pt-2 pb-1 small text-muted">
@@ -93,7 +90,7 @@ function App({nameSection}) {
             </div>
             
           </div>
-          {!isPreview && <SelectionSidebar />}
+          <SelectionSidebar />
         </div>
       </Editor>
 
