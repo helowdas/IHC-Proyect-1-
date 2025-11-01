@@ -1,5 +1,5 @@
 // components/user/Container.jsx
-import React, { useRef } from "react";
+import React from "react";
 import { useNode } from "@craftjs/core";
 
 export const Container = ({ 
@@ -40,67 +40,6 @@ export const Container = ({
     selected: node.events.selected,
   }));
   const textAlign = align === 'center' ? 'center' : (align === 'flex-end' ? 'right' : 'left');
-
-  // Handle de movimiento (misma estructura que Card, actualizando translateX/Y)
-  const moveStart = useRef({ mx: 0, my: 0, x: Number(translateX) || 0, y: Number(translateY) || 0 });
-  const onMoveMouseDown = (e) => {
-    e.stopPropagation();
-    moveStart.current = {
-      mx: e.clientX,
-      my: e.clientY,
-      x: Number(translateX) || 0,
-      y: Number(translateY) || 0,
-    };
-
-    const onMove = (ev) => {
-      const dx = ev.clientX - moveStart.current.mx;
-      const dy = ev.clientY - moveStart.current.my;
-      setProp((p) => {
-        p.translateX = Math.round((moveStart.current.x ?? 0) + dx);
-        p.translateY = Math.round((moveStart.current.y ?? 0) + dy);
-      }, 0);
-    };
-
-    const onUp = () => {
-      window.removeEventListener('mousemove', onMove);
-      window.removeEventListener('mouseup', onUp);
-    };
-
-    window.addEventListener('mousemove', onMove);
-    window.addEventListener('mouseup', onUp);
-  };
-
-  // NUEVO: redimensionado
-  const resizeStart = useRef({ x: 0, y: 0, w: 0, h: 0 });
-  const onResizeMouseDown = (e) => {
-    e.stopPropagation();
-    const rect = e.currentTarget.parentElement?.getBoundingClientRect();
-    resizeStart.current = {
-      x: e.clientX,
-      y: e.clientY,
-      w: typeof width === 'number' ? width : Math.round(rect?.width || Number(minWidth) || 100),
-      h: typeof height === 'number' ? height : Math.round(rect?.height || Number(minHeight) || 60),
-    };
-
-    const onMove = (ev) => {
-      const dx = ev.clientX - resizeStart.current.x;
-      const dy = ev.clientY - resizeStart.current.y;
-      const newW = Math.max(Number(minWidth) || 0, Math.round(resizeStart.current.w + dx));
-      const newH = Math.max(Number(minHeight) || 0, Math.round(resizeStart.current.h + dy));
-      setProp((p) => {
-        p.width = newW;
-        p.height = newH;
-      }, 0);
-    };
-
-    const onUp = () => {
-      window.removeEventListener('mousemove', onMove);
-      window.removeEventListener('mouseup', onUp);
-    };
-
-    window.addEventListener('mousemove', onMove);
-    window.addEventListener('mouseup', onUp);
-  };
 
   const baseStyle = {
     margin: typeof margin === 'number' ? `${margin}px` : (margin || 0),
@@ -149,42 +88,7 @@ export const Container = ({
     >
       {children}
 
-      {selected && (
-        <>
-          {/* Handle de movimiento */}
-          <div
-            onMouseDown={onMoveMouseDown}
-            title="Arrastra para mover"
-            style={{
-              position: 'absolute',
-              left: 4,
-              top: 4,
-              width: 14,
-              height: 14,
-              borderRadius: 3,
-              cursor: 'move',
-              boxShadow: '0 0 0 1px rgba(0,0,0,0.15)',
-              background: 'rgba(0,0,0,0.15)',
-            }}
-          />
-          {/* NUEVO: Handle de redimensionado (esquina inferior derecha) */}
-          <div
-            onMouseDown={onResizeMouseDown}
-            title="Arrastra para redimensionar"
-            style={{
-              position: 'absolute',
-              right: 4,
-              bottom: 4,
-              width: 14,
-              height: 14,
-              borderRadius: 3,
-              cursor: 'nwse-resize',
-              boxShadow: '0 0 0 1px rgba(0,0,0,0.15)',
-              background: 'rgba(0,0,0,0.15)',
-            }}
-          />
-        </>
-      )}
+      {selected && null}
     </div>
   )
 }

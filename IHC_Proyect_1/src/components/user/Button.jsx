@@ -1,5 +1,5 @@
 // components/user/Button.jsx (Bootstrap/Tailwind)
-import React, { useRef } from "react";
+import React from "react";
 import { useNode } from "@craftjs/core";
 import { useNavigate } from "react-router-dom";
 
@@ -70,34 +70,7 @@ export const Button = ({
     }
   };
 
-  // Handle de movimiento (misma estructura que Card, actualizando translateX/Y)
-  const moveStart = useRef({ mx: 0, my: 0, x: Number(translateX) || 0, y: Number(translateY) || 0 });
-  const onMoveMouseDown = (e) => {
-    e.stopPropagation();
-    moveStart.current = {
-      mx: e.clientX,
-      my: e.clientY,
-      x: Number(translateX) || 0,
-      y: Number(translateY) || 0,
-    };
-
-    const onMove = (ev) => {
-      const dx = ev.clientX - moveStart.current.mx;
-      const dy = ev.clientY - moveStart.current.my;
-      setProp((p) => {
-        p.translateX = Math.round((moveStart.current.x ?? 0) + dx);
-        p.translateY = Math.round((moveStart.current.y ?? 0) + dy);
-      }, 0);
-    };
-
-    const onUp = () => {
-      window.removeEventListener('mousemove', onMove);
-      window.removeEventListener('mouseup', onUp);
-    };
-
-    window.addEventListener('mousemove', onMove);
-    window.addEventListener('mouseup', onUp);
-  };
+  // Eliminado: manejo de movimiento por arrastre del mouse
 
   // Map props -> Bootstrap classes and merge with custom className
   const colorToken = (color || "primary").toLowerCase();
@@ -149,26 +122,7 @@ export const Button = ({
     >
       {text}
 
-      {selected && (
-        <>
-          {/* Handle de movimiento */}
-          <div
-            onMouseDown={onMoveMouseDown}
-            title="Arrastra para mover"
-            style={{
-              position: 'absolute',
-              left: 4,
-              top: 4,
-              width: 14,
-              height: 14,
-              borderRadius: 3,
-              cursor: 'move',
-              boxShadow: '0 0 0 1px rgba(0,0,0,0.15)',
-              background: 'rgba(0,0,0,0.15)',
-            }}
-          />
-        </>
-      )}
+      {selected && null}
     </button>
   )
 }
