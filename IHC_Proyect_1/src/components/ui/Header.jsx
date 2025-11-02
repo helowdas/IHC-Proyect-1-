@@ -377,19 +377,13 @@ export default function Header({ nameSection }) {
     <>
     <div className="d-flex align-items-center justify-content-between px-3 py-2 border-bottom bg-white">
       <div className="d-flex align-items-center gap-3">
+        <div className="h4 m-0 fw-bold">Ágora</div>
         <button 
           type="button" 
-          className="btn btn-link text-decoration-none p-0"
+          className="btn btn-a50104"
           onClick={() => navigate('/')}
         >
-          <div className="h4 m-0 fw-bold">Ágora</div>
-        </button>
-        <button 
-          type="button" 
-          className="btn btn-outline-secondary"
-          onClick={() => navigate('/')}
-        >
-          Home/Inicio
+          Inicio
         </button>
       </div>
       <div className="d-flex align-items-center gap-2">
