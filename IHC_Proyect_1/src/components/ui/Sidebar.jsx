@@ -435,16 +435,17 @@ function SectionItem({ name, isActive, onDelete, onRename, onPaste, onDragStart,
       onDragStart={handleDragStartLocal}
       className="mb-2 d-flex flex-column align-items-start justify-content-between gap-1"
     >
-      <div className="grow d-flex flex-wrap align-items-center justify-content-between gap-2 w-100">
+      <div className="grow d-flex align-items-center gap-2 w-100">
         <Link
           to={`/editor?section=${encodeURIComponent(name)}`}
-          className={`btn btn-sm btn-a50104 d-inline-flex align-items-center justify-content-center flex-grow-1${isActive ? " active" : ""}`}
+          className={`btn btn-sm btn-a50104 d-inline-flex align-items-center flex-grow-1${isActive ? " active" : ""}`}
+          style={{ minWidth: 0, overflow: 'hidden' }}
           title={name}
           aria-label={`Ir a ${name}`}
           aria-current={isActive ? "page" : undefined}
         >
-          <i className="bi bi-file-earmark-text fs-5" aria-hidden="true"></i>
-          <span className="ms-1">{name}</span>
+          <i className="bi bi-file-earmark-text fs-5 flex-shrink-0" aria-hidden="true"></i>
+          <span className="ms-1 text-truncate">{name}</span>
         </Link>
         
         <SectionMenu
