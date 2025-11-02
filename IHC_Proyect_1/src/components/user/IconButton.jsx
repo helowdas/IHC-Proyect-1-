@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNode } from '@craftjs/core';
+import { useNode, useEditor } from '@craftjs/core';
 import IconPicker from '../ui/IconPicker';
 
 export const IconButton = ({
@@ -22,11 +22,13 @@ export const IconButton = ({
   opacity = 1
 }) => {
   const {
+    id,
     connectors: { connect, drag },
     selected
   } = useNode((node) => ({
     selected: node.events.selected
   }));
+  const { actions: { add, selectNode }, query: { createNode, node } } = useEditor();
 
   const handleClick = (e) => {
     e.stopPropagation();
@@ -73,7 +75,51 @@ export const IconButton = ({
         }}
       ></i>
 
-      {selected && null}
+      {selected && (
+        <span
+          role="button"
+          aria-label="Duplicar"
+          className="position-absolute"
+          style={{
+            top: -14,
+            right: -14,
+            width: 28,
+            height: 28,
+            borderRadius: '50%',
+            backgroundColor: '#590004',
+            color: '#fff',
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 0 8px #590004, 0 0 12px #590004',
+            cursor: 'pointer',
+            zIndex: 9999,
+          }}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const current = node(id).get();
+            const { type, props, parent } = {
+              type: current.data.type,
+              props: current.data.props,
+              parent: current.data.parent,
+            };
+            const parentNode = node(parent).get();
+            const siblings = parentNode.data.nodes || [];
+            const index = Math.max(0, siblings.indexOf(id));
+            const shiftedProps = {
+              ...props,
+              translateX: (Number(props.translateX) || 0) + 10,
+              translateY: (Number(props.translateY) || 0) + 10,
+            };
+            const newNode = createNode(React.createElement(type, shiftedProps));
+            add(newNode, parent, index + 1);
+            selectNode(newNode.id);
+          }}
+        >
+          <i className="bi bi-copy" />
+        </span>
+      )}
     </div>
   );
 };

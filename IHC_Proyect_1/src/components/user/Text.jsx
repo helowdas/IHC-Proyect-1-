@@ -1,12 +1,13 @@
 // components/user/Text.js
 import React, { useEffect, useState } from "react";
-import { useNode } from "@craftjs/core";
+import { useNode, useEditor } from "@craftjs/core";
 
 export const Text = ({ text, fontSize, fontClass, translateX = 0, translateY = 0, zIndex = 0, opacity = 1, textColor = '#000000', textShadowX = 0, textShadowY = 0, textShadowBlur = 0, textShadowColor = '#000000', textAlign = 'left', lineHeight = 1.5 }) => {
-  const { connectors: { connect, drag },hasSelectedNode, hasDraggedNode, actions: { setProp } } = useNode((state) => ({
+  const { id, connectors: { connect, drag }, hasSelectedNode, hasDraggedNode, actions: { setProp } } = useNode((state) => ({
     hasSelectedNode: state.events.selected,
     hasDraggedNode: state.events.dragged
   }));
+  const { actions: { add, selectNode }, query: { createNode, node } } = useEditor();
 
   const [editable, setEditable] = useState(false);
   useEffect(() => {!hasSelectedNode && setEditable(false)},[hasSelectedNode])
@@ -35,7 +36,51 @@ export const Text = ({ text, fontSize, fontClass, translateX = 0, translateY = 0
         {text}
       </p>
 
-      {hasSelectedNode && null}
+      {hasSelectedNode && (
+        <span
+          role="button"
+          aria-label="Duplicar"
+          className="position-absolute"
+          style={{
+            top: -14,
+            right: -14,
+            width: 28,
+            height: 28,
+            borderRadius: '50%',
+            backgroundColor: '#590004',
+            color: '#fff',
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            zIndex: 9999,
+          }}
+          onClick={(e) => {
+            e.preventDefault();
+            const current = node(id).get();
+            const { type, props, parent } = {
+              type: current.data.type,
+              props: current.data.props,
+              parent: current.data.parent,
+            };
+            const parentNode = node(parent).get();
+            const siblings = parentNode.data.nodes || [];
+            const index = Math.max(0, siblings.indexOf(id));
+
+            const shiftedProps = {
+              ...props,
+              translateX: (Number(props.translateX) || 0) + 10,
+              translateY: (Number(props.translateY) || 0) + 10,
+            };
+
+            const newNode = createNode(React.createElement(type, shiftedProps));
+            add(newNode, parent, index + 1);
+            selectNode(newNode.id);
+          }}
+        >
+          <i className="bi bi-copy" />
+        </span>
+      )}
     </div>
   )
 }
