@@ -6,6 +6,7 @@ import { Text } from '../user/Text';
 import { Image } from '../user/Image';
 import { Card } from '../user/Card';
 import { ChevronButton } from '../user/ChevronButton';
+import { IconButton } from '../user/IconButton';
 import {BackgroundImageContainer} from "../user/ImageContainer";
 import Sidebar from "./Sidebar";
 
@@ -55,6 +56,14 @@ export default function Palette() {
               type="button"
             >
               <span className="bi bi-lightning"></span> Botón
+            </button>
+
+            <button
+              ref={(ref) => ref && connectors.create(ref, <IconButton iconName="star" iconSize={24} />)}
+              className="btn btn-light d-flex align-items-center gap-2 text-start"
+              type="button"
+            >
+              <span className="bi bi-app"></span> Icono
             </button>
 
             <button
