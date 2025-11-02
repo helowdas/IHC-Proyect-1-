@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { useEditor } from '@craftjs/core';
+import { useNavigate } from 'react-router-dom';
 import { saveSectionData } from '../../hooks/useSaveSectionData';
 
 export default function Header({ nameSection }) {
+  const navigate = useNavigate();
   const { enabled, actions, query } = useEditor((state) => ({
     enabled: state.options.enabled,
   }));
@@ -56,7 +58,13 @@ export default function Header({ nameSection }) {
     <>
     <div className="d-flex align-items-center justify-content-between px-3 py-2 border-bottom bg-white">
       <div className="d-flex align-items-center gap-3">
-        <div className="h4 m-0 fw-bold">Ágora</div>
+        <button 
+          type="button" 
+          className="btn btn-link text-decoration-none p-0"
+          onClick={() => navigate('/')}
+        >
+          <div className="h4 m-0 fw-bold">Ágora</div>
+        </button>
       </div>
       <div className="d-flex align-items-center gap-2">
         <button

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import Editor from './pages/Editor.jsx';
+import Dashboard from './pages/Dashboard.jsx';
 
 // Vista simple para placeholders
 function Page({ title, children }) {
@@ -31,10 +32,10 @@ export default function App() {
 
   return (
     <div className="min-h-screen">
-      <div className={`p-4 route-wrapper ${stage}`} onAnimationEnd={handleAnimationEnd}>
+      <div className={`route-wrapper ${stage}`} onAnimationEnd={handleAnimationEnd}>
         <Routes location={displayLocation}>
-          {/* Redirige la ruta raíz al editor para que se muestre primero */}
-          <Route path="/" element={<Navigate to="/editor" replace />} />
+          {/* Ruta raíz: Dashboard principal */}
+          <Route path="/" element={<Dashboard />} />
 
           {/* Rutas principales */}
           <Route path="/editor" element={<Editor nameSection={"editor"}/>} />
