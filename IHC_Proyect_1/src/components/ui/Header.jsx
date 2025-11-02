@@ -67,6 +67,13 @@ export default function Header({ nameSection }) {
         >
           <div className="h4 m-0 fw-bold">Ágora</div>
         </button>
+        <button 
+          type="button" 
+          className="btn btn-outline-secondary"
+          onClick={() => navigate('/')}
+        >
+          Home/Inicio
+        </button>
       </div>
       <div className="d-flex align-items-center gap-2">
         <button

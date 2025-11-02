@@ -9,8 +9,7 @@ function Dashboard() {
   };
 
   const handleViewDesigns = () => {
-    // TODO: Implementar vista de galería
-    alert('Funcionalidad de Ver Diseños próximamente');
+    navigate('/editor');
   };
 
   const handleExportDesigns = () => {
@@ -22,7 +21,14 @@ function Dashboard() {
     <div className="min-vh-100 bg-light d-flex flex-column">
       {/* Header con título y perfil */}
       <div className="bg-white border-bottom d-flex justify-content-between align-items-center px-4 py-3">
-        <h1 className="mb-0 fw-bold fs-2">Ágora</h1>
+        <button 
+          type="button"
+          className="btn btn-link text-decoration-none p-0"
+          onClick={() => navigate('/')}
+          style={{ border: 'none', background: 'none' }}
+        >
+          <h1 className="mb-0 fw-bold fs-2 text-dark" style={{ cursor: 'pointer' }}>Ágora</h1>
+        </button>
         <div className="position-relative">
           <i className="bi bi-person-circle fs-3 text-secondary" style={{ cursor: 'pointer' }}></i>
           <span className="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle">
