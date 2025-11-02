@@ -160,7 +160,7 @@ export const ContainerSettings = () => {
           <div className="small text-muted">{(props.opacity ?? 1).toFixed(2)}</div>
         </div>
         <div>
-          <label className="form-label">Z-index</label>
+          <label className="form-label">Nivel de profundidad (Z-index)</label>
           <input
             type="number"
             className="form-control form-control-sm"
@@ -271,7 +271,7 @@ export const ContainerSettings = () => {
                 <option value="flex-start">Inicio</option>
                 <option value="center">Centro</option>
                 <option value="flex-end">Fin</option>
-                <option value="stretch">Stretch</option>
+                <option value="stretch">Estirar</option>
               </select>
             </div>
             <div>
@@ -296,9 +296,9 @@ export const ContainerSettings = () => {
                 value={props.wrap || 'nowrap'}
                 onChange={(e) => setProp((p) => (p.wrap = e.target.value))}
               >
-                <option value="nowrap">No wrap</option>
-                <option value="wrap">Wrap</option>
-                <option value="wrap-reverse">Wrap reverse</option>
+                <option value="nowrap">Sin salto</option>
+                <option value="wrap">Con salto</option>
+                <option value="wrap-reverse">Salto invertido</option>
               </select>
             </div>
           </>
@@ -329,7 +329,7 @@ export const ContainerSettings = () => {
                 <option value="start">Inicio</option>
                 <option value="center">Centro</option>
                 <option value="end">Fin</option>
-                <option value="stretch">Stretch</option>
+                <option value="stretch">Estirar</option>
               </select>
             </div>
             <div>
@@ -342,7 +342,7 @@ export const ContainerSettings = () => {
                 <option value="start">Inicio</option>
                 <option value="center">Centro</option>
                 <option value="end">Fin</option>
-                <option value="stretch">Stretch</option>
+                <option value="stretch">Estirar</option>
               </select>
             </div>
           </>
@@ -363,7 +363,7 @@ export const ContainerSettings = () => {
         </div>
 
         <div>
-          <label className="form-label">Border Radius</label>
+          <label className="form-label">Radio del borde</label>
           <input
             type="range"
             className="form-range"
@@ -377,7 +377,7 @@ export const ContainerSettings = () => {
         </div>
 
         <div>
-          <label className="form-label">Box Shadow</label>
+          <label className="form-label">Sombra</label>
           <input
             type="color"
             className="form-control form-control-color"

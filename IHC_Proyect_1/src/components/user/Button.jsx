@@ -21,7 +21,7 @@ export const Button = ({
   translateX = 0,
   translateY = 0,
   zIndex = 0,
-  text = "Click me",
+  text = "Haz clic aquí",
   opacity = 1,
   className = "",
   children
@@ -255,9 +255,9 @@ const ButtonSettings = () => {
             value={props.size || 'small'}
             onChange={(e) => setProp((props) => (props.size = e.target.value))}
           >
-            <option value="small">Small</option>
-            <option value="medium">Medium</option>
-            <option value="large">Large</option>
+            <option value="small">Pequeño</option>
+            <option value="medium">Mediano</option>
+            <option value="large">Grande</option>
           </select>
         </div>
         <div>
@@ -267,9 +267,9 @@ const ButtonSettings = () => {
             value={props.variant || 'contained'}
             onChange={(e) => setProp((props) => (props.variant = e.target.value))}
           >
-            <option value="text">Text</option>
-            <option value="outlined">Outlined</option>
-            <option value="contained">Contained</option>
+            <option value="text">Texto</option>
+            <option value="outlined">Con borde</option>
+            <option value="contained">Relleno</option>
           </select>
         </div>
         <div>
@@ -279,14 +279,14 @@ const ButtonSettings = () => {
             value={props.color || 'primary'}
             onChange={(e) => setProp((props) => (props.color = e.target.value))}
           >
-            <option value="primary">primary</option>
-            <option value="secondary">secondary</option>
-            <option value="success">success</option>
-            <option value="danger">danger</option>
-            <option value="warning">warning</option>
-            <option value="info">info</option>
-            <option value="light">light</option>
-            <option value="dark">dark</option>
+            <option value="primary">Principal</option>
+            <option value="secondary">Secundario</option>
+            <option value="success">Éxito</option>
+            <option value="danger">Peligro</option>
+            <option value="warning">Advertencia</option>
+            <option value="info">Información</option>
+            <option value="light">Claro</option>
+            <option value="dark">Oscuro</option>
           </select>
         </div>
         <hr />
@@ -353,7 +353,7 @@ Button.craft = {
     buttonBgColor: '',
     buttonBorderColor: '',
     actionType: 'route',
-    text: "Click me",
+    text: "Haz clic aquí",
     to: "",
     sectionName: "",
     externalUrl: "",

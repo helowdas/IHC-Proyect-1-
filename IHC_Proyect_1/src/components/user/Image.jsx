@@ -163,7 +163,7 @@ export function ImageSettings() {
           <div className="small text-muted">{(props.opacity ?? 1).toFixed(2)}</div>
         </div>
         <div>
-          <label className="form-label">Z-index</label>
+          <label className="form-label">Nivel de profundidad (Z-index)</label>
           <input
             className="form-control form-control-sm"
             type="number"
@@ -248,11 +248,11 @@ export function ImageSettings() {
             value={props.fit || 'cover'}
             onChange={(e) => setProp((props) => (props.fit = e.target.value))}
           >
-            <option value="contain">contain</option>
-            <option value="cover">cover</option>
-            <option value="fill">fill</option>
-            <option value="none">none</option>
-            <option value="scale-down">scale-down</option>
+            <option value="contain">Contener</option>
+            <option value="cover">Cubrir</option>
+            <option value="fill">Llenar</option>
+            <option value="none">Ninguno</option>
+            <option value="scale-down">Reducir</option>
           </select>
         </div>
         <hr />

@@ -83,11 +83,11 @@ export const Card = ({
     >
       <Container background={background} padding={padding}>
         <Element id="text" is={CardTop} canvas>
-          <Text text="Title" fontSize={20} />
-          <Text text="Subtitle" fontSize={15} />
+          <Text text="Título" fontSize={20} />
+          <Text text="Subtítulo" fontSize={15} />
         </Element>
         <Element id="buttons" is={CardBottom} canvas>
-          <Button size="small" text="Learn more" variant="contained" color="primary">Click me</Button>
+          <Button size="small" text="Saber más" variant="contained" color="primary">Haz clic aquí</Button>
         </Element>
       </Container>
       {selected && (

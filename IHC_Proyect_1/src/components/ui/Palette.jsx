@@ -71,7 +71,7 @@ export default function Palette() {
               className="btn btn-light d-flex align-items-center gap-2 text-start"
               type="button"
             >
-              <span className="bi bi-chevron-left"></span> Boton de Navegacion
+              <span className="bi bi-chevron-left"></span> Botón de Navegación
             </button>
 
             <button

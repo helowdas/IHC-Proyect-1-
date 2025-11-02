@@ -94,7 +94,7 @@ const TextSettings = () => {
     <>
       <div className="d-grid gap-3">
           <div>
-            <label className="form-label">Z-index</label>
+            <label className="form-label">Nivel de profundidad (Z-index)</label>
             <input
               className="form-control form-control-sm"
               type="number"
@@ -174,7 +174,7 @@ const TextSettings = () => {
               />
             </div>
             <div className="col-4">
-              <label className="form-label">Blur</label>
+              <label className="form-label">Desenfoque</label>
               <input
                 className="form-control form-control-sm"
                 type="number"
