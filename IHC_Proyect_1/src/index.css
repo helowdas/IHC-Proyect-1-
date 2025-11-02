@@ -21,6 +21,12 @@
 	--font-jungle-camp: 'Jungle Camp', system-ui, sans-serif;
 }
 
+/* Clases explícitas para fuentes (safelisted para exportar)
+   Esto evita depender de la generación de utilidades de Tailwind
+   cuando las clases provienen de JSON dinámico en el viewer. */
+.font-amazonica { font-family: var(--font-amazonica, 'Amazonica', system-ui, sans-serif); }
+.font-jungle-camp { font-family: var(--font-jungle-camp, 'Jungle Camp', system-ui, sans-serif); }
+
 /* Route transition styles */
 .route-wrapper.fadeIn {
 	animation: rr-fade-in 300ms ease-out forwards;
