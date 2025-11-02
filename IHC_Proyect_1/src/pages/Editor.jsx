@@ -15,6 +15,7 @@ import { ChevronButton } from '../components/user/ChevronButton';
 import { IconButton } from '../components/user/IconButton';
 
 import { Editor, Frame, Element, useEditor } from '@craftjs/core';
+import { Layers } from '@craftjs/layers';
 import { useSearchParams } from 'react-router-dom';
 import { useGetSectionData } from '../hooks/useGetSectionData';
 
@@ -91,7 +92,19 @@ function App({nameSection}) {
             </div>
             
           </div>
-          <SelectionSidebar />
+          {/* Paneles de la derecha: Layers siempre visible, Settings cuando hay selección */}
+          <div className="d-flex border-start">
+            {/* Panel de Layers */}
+            <div className="bg-white" style={{ width: 280, overflow: 'auto', maxHeight: '100%' }}>
+              <div className="p-3 border-bottom">
+                <h6 className="mb-0">Capas</h6>
+                <small className="text-muted">Estructura del diseño</small>
+              </div>
+              <Layers expandRootOnLoad={true} />
+            </div>
+            {/* Panel de Settings (solo visible cuando hay un nodo seleccionado) */}
+            <SelectionSidebar />
+          </div>
         </div>
       </Editor>
 
