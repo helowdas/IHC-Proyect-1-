@@ -2,12 +2,14 @@ import React, { useState } from 'react';
 import { useEditor } from '@craftjs/core';
 import { useNavigate } from 'react-router-dom';
 import { saveSectionData } from '../../hooks/useSaveSectionData';
+import { useUndoHistory } from '../../hooks/useUndoHistory';
 
 export default function Header({ nameSection }) {
   const navigate = useNavigate();
   const { enabled, actions, query } = useEditor((state) => ({
     enabled: state.options.enabled,
   }));
+  const { undo, canUndo } = useUndoHistory();
   const [showImport, setShowImport] = useState(false);
   const [importText, setImportText] = useState('');
   const [importError, setImportError] = useState('');
@@ -73,6 +75,20 @@ export default function Header({ nameSection }) {
           onClick={() => actions.setOptions((opts) => (opts.enabled = !enabled))}
         >
           {enabled ? 'Desactivar' : 'Activar'} editor
+        </button>
+
+        <button
+          type="button"
+          className="btn btn-outline-primary"
+          onClick={undo}
+          disabled={!canUndo}
+          title="Retroceder (Ctrl+Z)"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-counterclockwise" viewBox="0 0 16 16">
+            <path fillRule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2z"/>
+            <path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466"/>
+          </svg>
+          Retroceder
         </button>
 
         <button type="button" className="btn btn-success d-flex justify-content-between align-items-center gap-2" onClick={handleSave} disabled={isSaving || !sectionName}>

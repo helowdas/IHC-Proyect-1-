@@ -16,7 +16,6 @@ import { ChevronButton } from '../components/user/ChevronButton';
 import { Editor, Frame, Element, useEditor } from '@craftjs/core';
 import { useSearchParams } from 'react-router-dom';
 import { useGetSectionData } from '../hooks/useGetSectionData';
-import { useUndoHistory } from '../hooks/useUndoHistory';
 
 // Carga el JSON guardado para la sección indicada y lo inyecta al editor
 function SectionDataLoader({ sectionName }) {
@@ -46,12 +45,6 @@ function SectionDataLoader({ sectionName }) {
   return null;
 }
 
-// Componente para manejar el historial de deshacer
-function UndoHandler() {
-  useUndoHistory();
-  return null;
-}
-
 // Muestra el panel de Settings solo si hay un nodo seleccionado
 function SelectionSidebar() {
   const { currentNodeId } = useEditor((state) => {
@@ -77,8 +70,6 @@ function App({nameSection}) {
         <Header nameSection={sectionFromQuery} />
         {/* Carga el estado inicial del editor desde Supabase según la sección */}
         <SectionDataLoader sectionName={sectionFromQuery} />
-        {/* Maneja el historial de deshacer (Ctrl+Z) */}
-        <UndoHandler />
         <div className="d-flex grow" style={{ minHeight: 0 }}>
           {/* Columna izquierda: Sidebar encima de la paleta de componentes */}
           <div className="d-flex flex-column">
