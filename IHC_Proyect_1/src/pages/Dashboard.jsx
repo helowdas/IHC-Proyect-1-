@@ -5,7 +5,8 @@ function Dashboard() {
   const navigate = useNavigate();
 
   const handleCreateDesign = () => {
-    navigate('/editor');
+    // TODO: Implementar creación de diseño desde cero
+    alert('Funcionalidad de Crear Diseño próximamente');
   };
 
   const handleViewDesigns = () => {
