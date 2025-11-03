@@ -1,8 +1,10 @@
+import React from 'react';
 import { useNode, useEditor } from '@craftjs/core';
 import { uploadImage } from '../../../SupabaseCredentials';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {useUploadImage} from '../../hooks/useUploadImage';
 import { useNavigate } from 'react-router-dom';
+import { useSectionNames } from '../../hooks/useSectionNames';
 
 var handleFileChange;
 var uploading = false;
@@ -17,7 +19,7 @@ export const Image = ({
   zIndex = 0,
   opacity = 1,
   // Click behavior like Button
-  actionType = 'route', // 'route' | 'section' | 'external'
+  actionType = 'section', // 'route' | 'section' | 'external'
   to = '', // internal route or #anchor
   sectionName = '', // for section navigation
   externalUrl = '', // for external link
@@ -145,6 +147,21 @@ export function ImageSettings() {
   }));
 
   const {upload, isUploading, error} = useUploadImage("Assets");
+  const { names: sectionNames, loading: sectionsLoading } = useSectionNames();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [isExpanded, setIsExpanded] = useState(!props.sectionName); // Expandido por defecto si no hay sección seleccionada
+
+  // Sincronizar el estado de expansión cuando cambia la sección seleccionada
+  useEffect(() => {
+    if (!props.sectionName) {
+      setIsExpanded(true); // Expandir si se elimina la sección
+    }
+  }, [props.sectionName]);
+
+  // Filtrar secciones basado en el término de búsqueda
+  const filteredSections = sectionNames.filter(name =>
+    name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return(
     <>
@@ -260,23 +277,75 @@ export function ImageSettings() {
           <label className="form-label">Acción al hacer clic</label>
           <select
             className="form-select form-select-sm"
-            value={props.actionType || 'route'}
+            value={props.actionType || 'section'}
             onChange={(e) => setProp((p) => (p.actionType = e.target.value))}
           >
             <option value="section">Ir a sección</option>
             <option value="external">Enlace externo</option>
           </select>
         </div>
-        { (props.actionType || 'route') === 'section' && (
+        { (props.actionType || 'section') === 'section' && (
           <div>
-            <label className="form-label">Nombre de sección</label>
-            <input
-              className="form-control form-control-sm"
-              type="text"
-              value={props.sectionName ?? ''}
-              onChange={(e) => setProp((p) => (p.sectionName = e.target.value))}
-              placeholder="Landing, Home, ..."
-            />
+            <label className="form-label">Seleccionar sección</label>
+            {props.sectionName && !isExpanded ? (
+              <div
+                className="form-control form-control-sm d-flex justify-content-between align-items-center"
+                style={{ cursor: 'pointer' }}
+                onClick={() => setIsExpanded(true)}
+              >
+                <span>{props.sectionName}</span>
+                <i className="bi bi-chevron-down"></i>
+              </div>
+            ) : (
+              <>
+                <input
+                  className="form-control form-control-sm"
+                  type="text"
+                  placeholder="Buscar sección..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  disabled={sectionsLoading}
+                />
+                {sectionsLoading ? (
+                  <div className="text-muted small mt-2">Cargando secciones...</div>
+                ) : (
+                  <div className="mt-2" style={{ maxHeight: '200px', overflowY: 'auto', border: '1px solid #dee2e6', borderRadius: '0.25rem' }}>
+                    {filteredSections.length === 0 ? (
+                      <div className="text-muted small p-2 text-center">No se encontraron secciones</div>
+                    ) : (
+                      filteredSections.map((name) => (
+                        <div
+                          key={name}
+                          className={`p-2 ${props.sectionName === name ? 'bg-primary text-white' : 'bg-white'} ${props.sectionName !== name ? 'hover-bg-light' : ''}`}
+                          style={{
+                            cursor: 'pointer',
+                            borderBottom: '1px solid #dee2e6',
+                            transition: 'background-color 0.2s'
+                          }}
+                          onClick={() => {
+                            setProp((p) => (p.sectionName = name));
+                            setSearchTerm('');
+                            setIsExpanded(false); // Colapsar después de seleccionar
+                          }}
+                          onMouseEnter={(e) => {
+                            if (props.sectionName !== name) {
+                              e.currentTarget.style.backgroundColor = '#f8f9fa';
+                            }
+                          }}
+                          onMouseLeave={(e) => {
+                            if (props.sectionName !== name) {
+                              e.currentTarget.style.backgroundColor = '#ffffff';
+                            }
+                          }}
+                        >
+                          {name}
+                        </div>
+                      ))
+                    )}
+                  </div>
+                )}
+              </>
+            )}
           </div>
         )}
         { (props.actionType || 'route') === 'external' && (
@@ -320,7 +389,7 @@ Image.craft = {
     translateY: 0,
     zIndex: 0,
     opacity: 1,
-    actionType: 'route',
+    actionType: 'section',
     to: '',
     sectionName: '',
     externalUrl: '',
