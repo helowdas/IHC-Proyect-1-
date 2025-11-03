@@ -67,3 +67,16 @@
 	background-color: var(--a50104);
 	color: #fff;
 }
+
+.btn-darkRed {
+	--a50104: #590004;
+	background-color: var(--a50104);
+	color: #fff;
+	border-color: var(--a50104);
+}
+.btn-darkRed:hover,
+.btn-darkRed:focus {
+	background-color: #870103; /* slightly darker on hover */
+	border-color: #870103;
+	color: #fff;
+}
