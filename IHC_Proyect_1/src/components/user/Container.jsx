@@ -147,6 +147,43 @@ export const ContainerSettings = () => {
     <>
       <div className="d-grid gap-3">
         <div>
+          <label className="form-label">Tamaño</label>
+          <div className="row g-2">
+            <div className="col-6">
+              <div className="input-group input-group-sm">
+                <span className="input-group-text">Ancho</span>
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="e.g. 100% o 320"
+                  value={props.width ?? ''}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    setProp((p) => (p.width = v === '' ? null : (isNaN(Number(v)) ? v : Number(v))));
+                  }}
+                />
+              </div>
+              <div className="small text-muted">Acepta número (px) o texto con unidad (%, px, auto)</div>
+            </div>
+            <div className="col-6">
+              <div className="input-group input-group-sm">
+                <span className="input-group-text">Alto</span>
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="e.g. auto o 240"
+                  value={props.height ?? ''}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    setProp((p) => (p.height = v === '' ? null : (isNaN(Number(v)) ? v : Number(v))));
+                  }}
+                />
+              </div>
+              <div className="small text-muted">Vacío = auto. Número: px; texto: usa la unidad indicada.</div>
+            </div>
+          </div>
+        </div>
+        <div>
           <label className="form-label">Opacidad</label>
           <input
             type="range"

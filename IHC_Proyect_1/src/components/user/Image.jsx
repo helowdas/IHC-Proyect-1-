@@ -13,6 +13,7 @@ export const Image = ({
   src = 'https://placehold.co/1200x500',
   alt = 'Imagen',
   width = 100,
+  height = null,
   fit = 'cover',
   translateX = 0,
   translateY = 0,
@@ -88,7 +89,7 @@ export const Image = ({
       <img
         src={src}
         alt={alt}
-        style={{ display: 'block', width: `${width}%`, height: 'auto', objectFit: fit, borderRadius: 4 }}
+        style={{ display: 'block', width: `${width}%`, height: Number.isFinite(height) ? `${height}px` : 'auto', objectFit: fit, borderRadius: 4 }}
       />
 
       {selected && (
@@ -259,6 +260,22 @@ export function ImageSettings() {
           <div className="small text-muted">{props.width ?? 100}%</div>
         </div>
         <div>
+          <label className="form-label">Alto (px)</label>
+          <input
+            type="number"
+            className="form-control form-control-sm"
+            min={0}
+            step={1}
+            value={Number.isFinite(props.height) ? props.height : ''}
+            onChange={(e) => {
+              const v = e.target.value;
+              setProp((p) => (p.height = v === '' ? null : Number(v)));
+            }}
+            placeholder="vacío = auto"
+          />
+          <div className="small text-muted">Deja vacío para mantener altura automática</div>
+        </div>
+        <div>
           <label className="form-label">Ajuste</label>
           <select
             className="form-select form-select-sm"
@@ -384,6 +401,7 @@ Image.craft = {
     src: 'https://placehold.co/1200x500',
     alt: 'Imagen',
     width: 100,
+    height: null,
     fit: 'cover',
     translateX: 0,
     translateY: 0,
