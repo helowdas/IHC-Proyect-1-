@@ -51,7 +51,8 @@ export const BackgroundImageContainer = ({
     backgroundPosition: 'center',
     backgroundRepeat: 'no-repeat',
     gap: typeof gap === 'number' ? `${gap}px` : gap,
-    transform: `translate(${Number(translateX) || 0}px, ${Number(translateY) || 0}px) scale(${Number(canvasScale) || 1})`,
+  // Mantener posiciones internas estables: no escalar aquí; el escalado visual lo maneja el viewport.
+  transform: `translate(${Number(translateX) || 0}px, ${Number(translateY) || 0}px)`,
     transformOrigin: 'top left',
     margin: typeof margin === 'number' ? `${margin}px` : (margin || 0),
     opacity: Math.max(0, Math.min(1, Number(opacity) || 0)),

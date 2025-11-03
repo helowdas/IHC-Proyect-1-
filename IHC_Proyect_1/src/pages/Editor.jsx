@@ -184,17 +184,27 @@ function App({nameSection}) {
                 Sección actual: <span className="fw-semibold">{sectionFromQuery || 'Sin sección'}</span>
             </div>
 
-            {/* Canvas escalado centrado visualmente, manteniendo overflow real */}
-            <div style={{ width: TARGET_W * scale, margin: '0 auto' }}>
+            {/* Canvas escalado por transform, sin alterar el layout interno.
+                El wrapper da el tamaño "real" escalado para que el viewport pueda hacer scroll. */}
+            <div
+              style={{
+                width: TARGET_W * scale,
+                height: TARGET_H * scale,
+                margin: '0 auto',
+                position: 'relative',
+              }}
+            >
               <div
                 className="position-relative"
                 data-editor="canvas-frame"
                 style={{
-                  width: '100%',
-                  height: TARGET_H * scale,
+                  width: TARGET_W,
+                  height: TARGET_H,
                   overflow: 'hidden',
                   backgroundColor: 'transparent',
                   outline: '1px solid #000',
+                  transform: `scale(${scale})`,
+                  transformOrigin: 'top left',
                 }}
                 ref={canvasRef}
               >
@@ -203,7 +213,6 @@ function App({nameSection}) {
                     is={BackgroundImageContainer}
                     padding={0}
                     canvas
-                    canvasScale={scale}
                     targetWidth={TARGET_W}
                     targetHeight={TARGET_H}
                   />
