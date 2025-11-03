@@ -31,6 +31,12 @@ const resolver = {
   IconButton,
 };
 
+// Dimensiones objetivo del lienzo, igual que en el editor
+const TARGET_W = 1280;
+const TARGET_H = 720;
+// Color de fondo por defecto para la página exportada
+const VIEWER_BG = '#0b090a';
+
 // Prefetch util: extrae URLs de imágenes desde un objeto/JSON cualquiera
 function collectImageUrls(obj, out = new Set()) {
   if (!obj || typeof obj !== 'object') return out;
@@ -86,6 +92,32 @@ function prefetchImagesFromRoutes(routes) {
   }
 }
 
+function normalizeCraftState(rawState) {
+  try {
+    const TARGET = { w: TARGET_W, h: TARGET_H };
+    const obj = typeof rawState === 'string' ? JSON.parse(rawState) : JSON.parse(JSON.stringify(rawState));
+    const nodes = obj?.nodes || obj?.ROOT?.nodes || null;
+    const allNodes = obj?.nodes || (nodes ? nodes : null);
+    if (allNodes && typeof allNodes === 'object') {
+      for (const key of Object.keys(allNodes)) {
+        const n = allNodes[key];
+        const resolved = n?.data?.type?.resolvedName || n?.type || '';
+        if (resolved === 'BackgroundImageContainer') {
+          const p = (n.data && n.data.props) ? n.data.props : (n.props || (n.data = { ...(n.data||{}), props: {} }, n.data.props));
+          if (p) {
+            if (!Number.isFinite(Number(p.targetHeight)) || Number(p.targetHeight) <= 0) p.targetHeight = TARGET.h;
+            if (!Number.isFinite(Number(p.targetWidth))  || Number(p.targetWidth)  <= 0) p.targetWidth  = TARGET.w;
+          }
+        }
+      }
+    }
+    return JSON.stringify(obj);
+  } catch {
+    // En caso de cualquier forma desconocida, devolvemos el original sin tocar
+    return typeof rawState === 'string' ? rawState : JSON.stringify(rawState);
+  }
+}
+
 function Loader() {
   const { actions } = useEditor();
   useEffect(() => {
@@ -94,7 +126,7 @@ function Loader() {
       // eslint-disable-next-line no-console
       console.log('[Export Viewer] Estado recibido:', typeof raw, raw ? (typeof raw === 'string' ? raw.length + ' chars' : 'object') : 'null');
       if (!raw) return;
-      const json = typeof raw === 'string' ? raw : JSON.stringify(raw);
+      const json = normalizeCraftState(raw);
       actions.deserialize(json);
     } catch (e) {
       // eslint-disable-next-line no-console
@@ -155,7 +187,7 @@ function ViewerPage({ mode }) {
       if (!key) return;
       const raw = routes[key];
       if (!raw) return;
-      const json = typeof raw === 'string' ? raw : JSON.stringify(raw);
+      const json = normalizeCraftState(raw);
       actions.deserialize(json);
     } catch (e) {
       // eslint-disable-next-line no-console
@@ -165,10 +197,15 @@ function ViewerPage({ mode }) {
   // Reinicia animación en cada cambio de ruta
   useEffect(() => { setAnimKey((k) => k + 1); }, [location.pathname, location.search]);
   return (
-    <div key={animKey} className="route-wrapper fadeIn" style={{ width: '100%', maxWidth: 'none', margin: 0, minHeight: '100vh' }}>
-      <Frame>
-        <Element is={BackgroundImageContainer} padding={10} canvas />
-      </Frame>
+    <div key={animKey} className="route-wrapper fadeIn" style={{ width: '100%', maxWidth: 'none', margin: 0, minHeight: '100vh', background: VIEWER_BG }}>
+      <div style={{ display: 'flex', justifyContent: 'center', padding: '16px 0' }}>
+        <div style={{ width: TARGET_W, minHeight: TARGET_H, position: 'relative', overflow: 'visible' }}>
+          <Frame>
+            {/* Si el estado se deserializa, el árbol lo reemplaza. Este Element es sólo fallback. */}
+            <Element is={BackgroundImageContainer} padding={10} targetWidth={TARGET_W} targetHeight={TARGET_H} canvas />
+          </Frame>
+        </div>
+      </div>
     </div>
   );
 }
@@ -196,11 +233,15 @@ function ViewerApp() {
             <Route path="*" element={<div style={{padding:16}}>No encontrada</div>} />
           </Routes>
         ) : (
-          <div className="route-wrapper fadeIn" style={{ width: '100%', maxWidth: 'none', margin: 0, minHeight: '100vh' }}>
+          <div className="route-wrapper fadeIn" style={{ width: '100%', maxWidth: 'none', margin: 0, minHeight: '100vh', background: VIEWER_BG }}>
             {!mounted && <div style={{ padding: 16 }}>Cargando…</div>}
-            <Frame>
-              <Element is={BackgroundImageContainer} padding={10} canvas />
-            </Frame>
+            <div style={{ display: 'flex', justifyContent: 'center', padding: '16px 0' }}>
+              <div style={{ width: TARGET_W, minHeight: TARGET_H, position: 'relative', overflow: 'visible' }}>
+                <Frame>
+                  <Element is={BackgroundImageContainer} padding={10} targetWidth={TARGET_W} targetHeight={TARGET_H} canvas />
+                </Frame>
+              </div>
+            </div>
           </div>
         )}
       </Editor>
@@ -212,6 +253,11 @@ function ViewerApp() {
 const mount = () => {
   const el = document.getElementById('root');
   if (!el) return;
+  try {
+    // Fija color de fondo global del documento exportado
+    document.body.style.margin = '0';
+    document.body.style.backgroundColor = VIEWER_BG;
+  } catch {}
   const root = createRoot(el);
   root.render(
     <HashRouter>

@@ -57,6 +57,7 @@ function App({nameSection}) {
   const RIGHT_W = 300;  // ancho fijo aprox del panel derecho
   const viewportRef = useRef(null);
   const canvasRef = useRef(null);
+  const [contentHeight, setContentHeight] = useState(TARGET_H);
   const [fitScale, setFitScale] = useState(1); // escala que hace "encajar" el lienzo
   const [zoom, setZoom] = useState(1);        // multiplicador controlado por el usuario
   const scale = Math.max(0.1, Math.min(4, fitScale * zoom));
@@ -81,6 +82,21 @@ function App({nameSection}) {
         setHScroll((prev) => ({ value: Math.min(prev.value, max), max }));
       });
     });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  // Observar el tamaño real del canvas (sin escala) para que el wrapper refleje su altura
+  useEffect(() => {
+    const el = canvasRef.current;
+    if (!el) return;
+    const update = () => {
+      // offsetHeight refleja el alto real sin transform
+      const h = el.offsetHeight || TARGET_H;
+      setContentHeight(h);
+    };
+    update();
+    const ro = new ResizeObserver(update);
     ro.observe(el);
     return () => ro.disconnect();
   }, []);
@@ -189,7 +205,7 @@ function App({nameSection}) {
             <div
               style={{
                 width: TARGET_W * scale,
-                height: TARGET_H * scale,
+                height: contentHeight * scale,
                 margin: '0 auto',
                 position: 'relative',
               }}
@@ -199,8 +215,9 @@ function App({nameSection}) {
                 data-editor="canvas-frame"
                 style={{
                   width: TARGET_W,
-                  height: TARGET_H,
-                  overflow: 'hidden',
+                  height: 'auto',
+                  minHeight: TARGET_H,
+                  overflow: 'visible',
                   backgroundColor: 'transparent',
                   outline: '1px solid #000',
                   transform: `scale(${scale})`,

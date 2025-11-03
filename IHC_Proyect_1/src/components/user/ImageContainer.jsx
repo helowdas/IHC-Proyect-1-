@@ -40,12 +40,26 @@ export const BackgroundImageContainer = ({
 
   // Eliminado: manejo de movimiento por arrastre del mouse
 
+  // Altura efectiva: permitir crecer si el contenido excede la altura objetivo
+  // Nota: algunos estados antiguos no incluyen `targetHeight` en el nodo
+  // deserializado. En ese caso, asumimos 720px (tamaño del lienzo por defecto)
+  // para evitar que el contenedor renderice “a la mitad” del alto esperado.
+  const effectiveMinHeight = (() => {
+    const DEFAULT_TARGET_H = 720; // fallback seguro cuando no viene en props
+    const t = Number(targetHeight);
+    const baseTarget = Number.isFinite(t) && t > 0 ? t : DEFAULT_TARGET_H;
+    const m = Number(minHeight) || 0;
+    return Math.max(baseTarget, m);
+  })();
+
   const baseStyle = {
     width: targetWidth ? `${targetWidth}px` : '100%',
-    height: targetHeight ? `${targetHeight}px` : '100%',
+    // No fijamos height para que el contenido pueda expandirse verticalmente.
+    // Usamos minHeight para garantizar un alto base y permitir scroll en el viewport.
+    minHeight: `${effectiveMinHeight}px`,
     position: 'relative',
     padding: `${Math.max(5, padding)}px`,
-    minHeight: `${minHeight}px`,
+  // Nota: `minHeight` ya aplicado arriba como `effectiveMinHeight`.
     backgroundImage: transparentBackground ? 'none' : `url(${backgroundImage})`,
     backgroundSize: backgroundSize || 'cover',
     backgroundPosition: 'center',
