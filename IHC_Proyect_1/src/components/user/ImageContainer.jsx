@@ -5,13 +5,17 @@ import React from 'react';
 
 export const BackgroundImageContainer = ({
   backgroundImage = 'https://placehold.co/1200x500',
+  backgroundSize = 'cover',
+  canvasScale = 1,
+  targetWidth,
+  targetHeight,
   padding = 40,
   minHeight = 200,
   // Positioning
   translateX = 0,
   translateY = 0,
   zIndex = 0,
-  margin = 5,
+  margin = 0,
   opacity = 1,
   // Layout props (mismas que Container)
   layout = 'flex',
@@ -37,15 +41,18 @@ export const BackgroundImageContainer = ({
   // Eliminado: manejo de movimiento por arrastre del mouse
 
   const baseStyle = {
-    width: '100%',
+    width: targetWidth ? `${targetWidth}px` : '100%',
+    height: targetHeight ? `${targetHeight}px` : '100%',
     position: 'relative',
     padding: `${Math.max(5, padding)}px`,
     minHeight: `${minHeight}px`,
     backgroundImage: transparentBackground ? 'none' : `url(${backgroundImage})`,
-    backgroundSize: 'cover',
+    backgroundSize: backgroundSize || 'cover',
     backgroundPosition: 'center',
+    backgroundRepeat: 'no-repeat',
     gap: typeof gap === 'number' ? `${gap}px` : gap,
-    transform: `translate(${Number(translateX) || 0}px, ${Number(translateY) || 0}px)`,
+    transform: `translate(${Number(translateX) || 0}px, ${Number(translateY) || 0}px) scale(${Number(canvasScale) || 1})`,
+    transformOrigin: 'top left',
     margin: typeof margin === 'number' ? `${margin}px` : (margin || 0),
     opacity: Math.max(0, Math.min(1, Number(opacity) || 0)),
     zIndex: Number(zIndex) || 0,
@@ -121,6 +128,20 @@ export function BackgroundImageContainerSettings() {
   return (
     <div className="d-grid gap-3">
       <div>
+        <label className="form-label">Tamaño de la imagen</label>
+        <select
+          className="form-select form-select-sm"
+          value={props.backgroundSize || 'cover'}
+          onChange={(e) => setProp((p) => (p.backgroundSize = e.target.value))}
+        >
+          <option value="cover">Cubrir (cover)</option>
+          <option value="contain">Ajustar (contain)</option>
+          <option value="auto">Auto</option>
+          <option value="100% 100%">Estirar (100% 100%)</option>
+        </select>
+        <div className="small text-muted">Controla CSS background-size.</div>
+      </div>
+      <div>
         <label className="form-label">Opacidad</label>
         <input
           type="range"
@@ -150,10 +171,10 @@ export function BackgroundImageContainerSettings() {
           min={0}
           max={64}
           step={1}
-          value={typeof props.margin === 'number' ? props.margin : 5}
+          value={typeof props.margin === 'number' ? props.margin : 0}
           onChange={(e) => setProp((p) => (p.margin = Number(e.target.value)))}
         />
-        <div className="small text-muted">{props.margin ?? 5}px</div>
+        <div className="small text-muted">{props.margin ?? 0}px</div>
       </div>
       <div className="row g-2">
         <div className="col-6">
@@ -377,12 +398,13 @@ export function BackgroundImageContainerSettings() {
 BackgroundImageContainer.craft = {
   props: {
     backgroundImage: '',
+    backgroundSize: 'cover',
     padding: 40,
     minHeight: 200,
     translateX: 0,
     translateY: 0,
     zIndex: 0,
-    margin: 5,
+    margin: 0,
     opacity: 1,
     layout: 'flex',
     direction: 'column',

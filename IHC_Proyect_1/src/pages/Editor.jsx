@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import Header from '../components/ui/Header';
 import Palette from '../components/ui/Palette';
 import Sidebar from '../components/ui/Sidebar';
@@ -50,6 +50,115 @@ function App({nameSection}) {
   const [searchParams] = useSearchParams();
   const sectionFromQuery = searchParams.get('section') || nameSection;
   
+  // Canvas objetivo 1280x720 y auto-escala si no cabe en el panel central
+  const TARGET_W = 1280;
+  const TARGET_H = 720;
+  const LEFT_W = 300;   // ancho fijo aprox del panel izquierdo
+  const RIGHT_W = 300;  // ancho fijo aprox del panel derecho
+  const viewportRef = useRef(null);
+  const canvasRef = useRef(null);
+  const [fitScale, setFitScale] = useState(1); // escala que hace "encajar" el lienzo
+  const [zoom, setZoom] = useState(1);        // multiplicador controlado por el usuario
+  const scale = Math.max(0.1, Math.min(4, fitScale * zoom));
+  // Estado para scrollbar horizontal custom
+  const [hScroll, setHScroll] = useState({ value: 0, max: 0 });
+  
+  useEffect(() => {
+    const el = viewportRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(() => {
+      const rect = el.getBoundingClientRect();
+      // Dejar un pequeño padding
+      const availW = Math.max(0, rect.width - 16);
+      const availH = Math.max(0, rect.height - 16);
+      const s = Math.min(1, availW / TARGET_W, availH / TARGET_H);
+      setFitScale(s > 0 && Number.isFinite(s) ? s : 1);
+      // Recalcular límites de scroll cuando cambia el tamaño
+      requestAnimationFrame(() => {
+        const vp = viewportRef.current;
+        if (!vp) return;
+        const max = Math.max(0, vp.scrollWidth - vp.clientWidth);
+        setHScroll((prev) => ({ value: Math.min(prev.value, max), max }));
+      });
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  // Helpers de zoom
+  const setZoomStep = useCallback((delta) => {
+    setZoom((z) => {
+      const next = Math.max(0.1, Math.min(4 / Math.max(fitScale, 0.0001), z * (delta > 0 ? 1.1 : 0.9)));
+      return next;
+    });
+  }, [fitScale]);
+
+  const setZoomAbsolute = useCallback((target) => {
+    // target es el porcentaje deseado aplicado sobre 100% del tamaño real (1.0)
+    const desiredScale = target / 100; // relativo a real
+    // Convertimos a multiplicador sobre fitScale
+    const desiredZoom = desiredScale / Math.max(fitScale, 0.0001);
+    setZoom(Math.max(0.1, Math.min(4 / Math.max(fitScale, 0.0001), desiredZoom)));
+  }, [fitScale]);
+
+  // Zoom con rueda del mouse (Ctrl+rueda o gesto de pinza)
+  const onWheelZoom = useCallback((e) => {
+    const vp = viewportRef.current;
+    if (!vp) return;
+    // Solo si mantiene Ctrl (evita interferir con scroll normal). Muchos trackpads envían ctrlKey para "pinch".
+    if (!e.ctrlKey) return;
+    e.preventDefault();
+
+    const prevScale = scale;
+    const rect = vp.getBoundingClientRect();
+    const offsetX = e.clientX - rect.left; // px dentro del viewport visible
+    const offsetY = e.clientY - rect.top;
+
+    // punto de contenido (no escalado) bajo el cursor
+    const contentX = (vp.scrollLeft + offsetX) / prevScale;
+    const contentY = (vp.scrollTop + offsetY) / prevScale;
+
+    const direction = e.deltaY > 0 ? -1 : 1; // rueda hacia arriba = acercar
+    // actualizar zoom
+    setZoom((z) => {
+      const nextZ = Math.max(0.1, Math.min(4 / Math.max(fitScale, 0.0001), z * (direction > 0 ? 1.1 : 0.9)));
+      const nextScale = Math.max(0.1, Math.min(4, fitScale * nextZ));
+      // ajustar scroll para mantener el punto bajo el cursor estable
+      requestAnimationFrame(() => {
+        vp.scrollLeft = contentX * nextScale - offsetX;
+        vp.scrollTop = contentY * nextScale - offsetY;
+        const max = Math.max(0, vp.scrollWidth - vp.clientWidth);
+        setHScroll({ value: Math.max(0, Math.min(vp.scrollLeft, max)), max });
+      });
+      return nextZ;
+    });
+  }, [fitScale, scale]);
+
+  // Vincular el scroll del viewport con la barra inferior
+  const onViewportScroll = useCallback(() => {
+    const vp = viewportRef.current;
+    if (!vp) return;
+    const max = Math.max(0, vp.scrollWidth - vp.clientWidth);
+    setHScroll({ value: Math.max(0, Math.min(vp.scrollLeft, max)), max });
+  }, []);
+
+  const onHorizontalBarChange = useCallback((e) => {
+    const vp = viewportRef.current;
+    if (!vp) return;
+    const next = Number(e.target.value) || 0;
+    vp.scrollLeft = next;
+    const max = Math.max(0, vp.scrollWidth - vp.clientWidth);
+    setHScroll({ value: Math.max(0, Math.min(next, max)), max });
+  }, []);
+
+  // Recalcular límites del scroll cuando cambia la escala
+  useEffect(() => {
+    const vp = viewportRef.current;
+    if (!vp) return;
+    const max = Math.max(0, vp.scrollWidth - vp.clientWidth);
+    setHScroll((prev) => ({ value: Math.max(0, Math.min(prev.value, max)), max }));
+  }, [scale]);
+  
   return (
     <div className="min-vh-100 d-flex flex-column bg-light">
 
@@ -57,28 +166,82 @@ function App({nameSection}) {
         <Header nameSection={sectionFromQuery} />
         {/* Carga el estado inicial del editor desde Supabase según la sección */}
         <SectionDataLoader sectionName={sectionFromQuery} />
-        <div className="d-flex grow" style={{ minHeight: 0 }}>
+  <div className="d-flex grow" style={{ minHeight: 0 }}>
           {/* Columna izquierda: Sidebar encima de la paleta de componentes */}
-          <div className="d-flex flex-column">
+          <div className="d-flex flex-column" style={{ flex: `0 0 ${LEFT_W}px`, width: LEFT_W, minWidth: LEFT_W, maxWidth: LEFT_W, overflowY: 'auto' }}>
             <Palette />
           </div>
-          <div className="grow p-3" style={{ overflow: 'scroll', maxWidth: '750px' }}>
+          {/* Columna central: viewport para el canvas, se lleva la mayor parte */}
+          <div
+            className="pe-3 py-3 ps-0"
+            style={{ flex: '1 1 0%', minWidth: 0, overflow: 'auto' }}
+            ref={viewportRef}
+            onWheel={onWheelZoom}
+            onScroll={onViewportScroll}
+          >
 
-            <div className="px-2 pt-2 pb-1 small text-muted">
+            <div className="ps-2 pe-2 pt-2 pb-1 small text-muted">
                 Sección actual: <span className="fw-semibold">{sectionFromQuery || 'Sin sección'}</span>
             </div>
 
-            <div className="bg-white border rounded-1 px-1" style={{ maxWidth: '100%' }}>
-              <Frame>
-                <Element is={BackgroundImageContainer} padding={10} canvas>
-                          
-                </Element>
-              </Frame>
+            {/* Canvas escalado centrado visualmente, manteniendo overflow real */}
+            <div style={{ width: TARGET_W * scale, margin: '0 auto' }}>
+              <div
+                className="position-relative"
+                data-editor="canvas-frame"
+                style={{
+                  width: '100%',
+                  height: TARGET_H * scale,
+                  overflow: 'hidden',
+                  backgroundColor: 'transparent',
+                  outline: '1px solid #000',
+                }}
+                ref={canvasRef}
+              >
+                <Frame>
+                  <Element
+                    is={BackgroundImageContainer}
+                    padding={0}
+                    canvas
+                    canvasScale={scale}
+                    targetWidth={TARGET_W}
+                    targetHeight={TARGET_H}
+                  />
+                </Frame>
+              </div>
+            </div>
+
+            {/* Barra de controles e indicador debajo de la zona de edición */}
+            {/* Scrollbar horizontal custom */}
+            <div className="mt-2">
+              <input
+                type="range"
+                className="form-range"
+                min={0}
+                max={hScroll.max}
+                step={1}
+                value={hScroll.value}
+                onChange={onHorizontalBarChange}
+              />
+            </div>
+
+            <div className="d-flex justify-content-end align-items-center gap-2">
+              <div className="small text-muted px-2 py-1" style={{ background: 'rgba(255,255,255,0.7)', borderRadius: 6 }}>
+                {Math.round(TARGET_W)}×{Math.round(TARGET_H)} @ {Math.round(scale * 100)}%
+              </div>
+              <div className="d-flex gap-2">
+                <button type="button" className="btn btn-sm btn-light border" onClick={() => setZoomStep(-1)} title="Alejar (-)">−</button>
+                <button type="button" className="btn btn-sm btn-light border" onClick={() => setZoomAbsolute(100)} title="100%">100%</button>
+                <button type="button" className="btn btn-sm btn-light border" onClick={() => setZoomStep(1)} title="Acercar (+)">+</button>
+                <button type="button" className="btn btn-sm btn-light border" onClick={() => setZoom(1)} title="Ajustar a pantalla">Ajustar</button>
+              </div>
             </div>
             
           </div>
           {/* Panel derecho: Personalización y Capas */}
-          <RightPanel />
+          <div className="border-start" style={{ flex: `0 0 ${RIGHT_W}px`, width: RIGHT_W, minWidth: RIGHT_W, maxWidth: RIGHT_W, overflowY: 'auto' }}>
+            <RightPanel />
+          </div>
         </div>
       </Editor>
 

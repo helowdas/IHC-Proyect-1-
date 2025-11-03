@@ -16,3 +16,11 @@ Note: This will impact Vite dev & build performances.
 ## Expanding the ESLint configuration
 
 If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+
+## Editor: Zoom y desplazamiento
+
+En la vista del editor (1280×720), ahora puedes acercar/alejar el lienzo y desplazarte cuando exceda el área visible:
+
+- Ctrl + rueda del mouse (o gesto de pinza) para hacer zoom centrado bajo el cursor.
+- Botones en la esquina inferior derecha: −, 100%, + y Ajustar.
+- Cuando el lienzo sea más grande que el viewport, aparecen barras de desplazamiento horizontal y vertical para navegar.

@@ -165,7 +165,7 @@ function ViewerPage({ mode }) {
   // Reinicia animación en cada cambio de ruta
   useEffect(() => { setAnimKey((k) => k + 1); }, [location.pathname, location.search]);
   return (
-    <div key={animKey} className="route-wrapper fadeIn" style={{ maxWidth: '750px', margin: '0 auto', minHeight: 400 }}>
+    <div key={animKey} className="route-wrapper fadeIn" style={{ width: '100%', maxWidth: 'none', margin: 0, minHeight: '100vh' }}>
       <Frame>
         <Element is={BackgroundImageContainer} padding={10} canvas />
       </Frame>
@@ -196,7 +196,7 @@ function ViewerApp() {
             <Route path="*" element={<div style={{padding:16}}>No encontrada</div>} />
           </Routes>
         ) : (
-          <div className="route-wrapper fadeIn" style={{ maxWidth: '750px', margin: '0 auto', minHeight: 400 }}>
+          <div className="route-wrapper fadeIn" style={{ width: '100%', maxWidth: 'none', margin: 0, minHeight: '100vh' }}>
             {!mounted && <div style={{ padding: 16 }}>Cargando…</div>}
             <Frame>
               <Element is={BackgroundImageContainer} padding={10} canvas />
