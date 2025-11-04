@@ -14,7 +14,7 @@ export default function Palette() {
   const { connectors } = useEditor();
   const [view, setView] = useState('componentes'); // 'componentes' | 'sidebar'
   return (
-    <div className="p-3 border-end bg-body-tertiary" style={{ width: 280 }}>
+    <div className="p-3 border-end bg-body-tertiary" style={{ width: 280, overflowX: 'visible', minWidth: 280 }}>
       {/* Toggle buttons */}
       <div className="d-flex gap-2 mb-2">
         <button
@@ -41,74 +41,78 @@ export default function Palette() {
             <small className="text-muted">Arrastra para agregar</small>
           </div>
 
-          <div className="d-grid gap-2">
-            <button
-              ref={(ref) => ref && connectors.create(ref, <Text text="Texto" fontSize={18} />)}
-              className="btn btn-light d-flex align-items-center gap-2 text-start"
-              type="button"
-            >
-              <span className="bi bi-type"></span> Texto
-            </button>
+          <div style={{ overflowY: 'auto', maxHeight: 'calc(100vh - 200px)' }}>
+            <div className="d-grid gap-2">
+              <button
+                ref={(ref) => ref && connectors.create(ref, <Text text="Texto" fontSize={18} />)}
+                className="btn btn-light d-flex align-items-center gap-2 text-start"
+                type="button"
+              >
+                <span className="bi bi-type"></span> Texto
+              </button>
 
-            <button
-              ref={(ref) => ref && connectors.create(ref, <Button size="small" variant="contained">Botón</Button>)}
-              className="btn btn-light d-flex align-items-center gap-2 text-start"
-              type="button"
-            >
-              <span className="bi bi-lightning"></span> Botón
-            </button>
+              <button
+                ref={(ref) => ref && connectors.create(ref, <Button size="small" variant="contained">Botón</Button>)}
+                className="btn btn-light d-flex align-items-center gap-2 text-start"
+                type="button"
+              >
+                <span className="bi bi-lightning"></span> Botón
+              </button>
 
-            <button
-              ref={(ref) => ref && connectors.create(ref, <IconButton iconName="star" iconSize={24} />)}
-              className="btn btn-light d-flex align-items-center gap-2 text-start"
-              type="button"
-            >
-              <span className="bi bi-app"></span> Icono
-            </button>
+              <button
+                ref={(ref) => ref && connectors.create(ref, <IconButton iconName="star" iconSize={24} />)}
+                className="btn btn-light d-flex align-items-center gap-2 text-start"
+                type="button"
+              >
+                <span className="bi bi-app"></span> Icono
+              </button>
 
-            <button
-              ref={(ref) => ref && connectors.create(ref, <ChevronButton direction="left" color="#E6E3A1" />)}
-              className="btn btn-light d-flex align-items-center gap-2 text-start"
-              type="button"
-            >
-              <span className="bi bi-chevron-left"></span> Botón de Navegación
-            </button>
+              <button
+                ref={(ref) => ref && connectors.create(ref, <ChevronButton direction="left" color="#E6E3A1" />)}
+                className="btn btn-light d-flex align-items-center gap-2 text-start"
+                type="button"
+              >
+                <span className="bi bi-chevron-left"></span> Botón de Navegación
+              </button>
 
-            <button
-              ref={(ref) => ref && connectors.create(ref, <Image />)}
-              className="btn btn-light d-flex align-items-center gap-2 text-start"
-              type="button"
-            >
-              <span className="bi bi-image"></span> Imagen
-            </button>
+              <button
+                ref={(ref) => ref && connectors.create(ref, <Image />)}
+                className="btn btn-light d-flex align-items-center gap-2 text-start"
+                type="button"
+              >
+                <span className="bi bi-image"></span> Imagen
+              </button>
 
-            <button
-              ref={(ref) => ref && connectors.create(ref, <Element is={Container} padding={16} background="#ffffff" canvas />)}
-              className="btn btn-light d-flex align-items-center gap-2 text-start"
-              type="button"
-            >
-              <span className="bi bi-square"></span> Contenedor
-            </button>
+              <button
+                ref={(ref) => ref && connectors.create(ref, <Element is={Container} padding={16} background="#ffffff" canvas />)}
+                className="btn btn-light d-flex align-items-center gap-2 text-start"
+                type="button"
+              >
+                <span className="bi bi-square"></span> Contenedor
+              </button>
 
-            <button
-              ref={(ref) => ref && connectors.create(ref, <Element is={BackgroundImageContainer} padding={16} background="#ffffff" canvas />)}
-              className="btn btn-light d-flex align-items-center gap-2 text-start"
-              type="button"
-            >
-              <span className="bi bi-square"></span> Contenedor Imagen
-            </button>
+              <button
+                ref={(ref) => ref && connectors.create(ref, <Element is={BackgroundImageContainer} padding={16} background="#ffffff" canvas />)}
+                className="btn btn-light d-flex align-items-center gap-2 text-start"
+                type="button"
+              >
+                <span className="bi bi-square"></span> Contenedor Imagen
+              </button>
 
-            <button
-              ref={(ref) => ref && connectors.create(ref, <Element is={Card} />)}
-              className="btn btn-light d-flex align-items-center gap-2 text-start"
-              type="button"
-            >
-              <span className="bi bi-credit-card-2-front"></span> Tarjeta
-            </button>
+              <button
+                ref={(ref) => ref && connectors.create(ref, <Element is={Card} />)}
+                className="btn btn-light d-flex align-items-center gap-2 text-start"
+                type="button"
+              >
+                <span className="bi bi-credit-card-2-front"></span> Tarjeta
+              </button>
+            </div>
           </div>
         </>
       ) : (
-        <Sidebar />
+        <div style={{ overflowY: 'auto', maxHeight: 'calc(100vh - 200px)' }}>
+          <Sidebar />
+        </div>
       )}
     </div>
   );

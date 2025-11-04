@@ -220,9 +220,9 @@ const Sidebar = ({ items = [] }) => {
   });
 
   return (
-    <aside className="w-64 p-1 overflow-hidden">
+    <aside className="w-64 p-1" style={{ overflowX: 'visible', minWidth: '256px' }}>
       <div className="d-flex justify-content-start mb-3">
-        <div className="text-center w-100">
+        <div className="text-center w-100" style={{ overflowX: 'visible' }}>
           <div className="d-flex align-items-center justify-content-between mb-2">
             <div className="fw-semibold text-xl">Secciones</div>
             <button
@@ -434,12 +434,13 @@ function SectionItem({ name, isActive, onDelete, onRename, onPaste, onDragStart,
       draggable
       onDragStart={handleDragStartLocal}
       className="mb-2 d-flex flex-column align-items-start justify-content-between gap-1"
+      style={{ width: '100%', overflowX: 'visible' }}
     >
-      <div className="grow d-flex align-items-center gap-2 w-100">
+      <div className="grow d-flex align-items-center gap-2 w-100" style={{ minWidth: 0 }}>
         <Link
           to={`/editor?section=${encodeURIComponent(name)}`}
-          className={`btn btn-sm btn-a50104 d-inline-flex align-items-center flex-grow-1${isActive ? " active" : ""}`}
-          style={{ minWidth: 0, overflow: 'hidden' }}
+          className={`btn btn-sm btn-a50104 d-inline-flex align-items-center${isActive ? " active" : ""}`}
+          style={{ minWidth: 0, overflow: 'hidden', flex: '1 1 auto', maxWidth: 'calc(100% - 40px)' }}
           title={name}
           aria-label={`Ir a ${name}`}
           aria-current={isActive ? "page" : undefined}
@@ -448,12 +449,14 @@ function SectionItem({ name, isActive, onDelete, onRename, onPaste, onDragStart,
           <span className="ms-1 text-truncate">{name}</span>
         </Link>
         
-        <SectionMenu
-          sectionName={name}
-          onDelete={onDelete}
-          onRename={onRename}
-          onPaste={onPaste}
-        />
+        <div style={{ flexShrink: 0 }}>
+          <SectionMenu
+            sectionName={name}
+            onDelete={onDelete}
+            onRename={onRename}
+            onPaste={onPaste}
+          />
+        </div>
       </div>
       <div>
         {isActive ? (

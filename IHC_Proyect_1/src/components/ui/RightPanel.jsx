@@ -11,7 +11,7 @@ export default function RightPanel() {
   const [view, setView] = useState('personalizacion'); // 'personalizacion' | 'capas'
 
   return (
-    <div className="p-3 border-start bg-body-tertiary" style={{ width: 280 }}>
+    <div className="p-3 border-start bg-body-tertiary" style={{ width: 280, overflowX: 'visible', minWidth: 280 }}>
       {/* Toggle buttons */}
       <div className="d-flex gap-2 mb-2">
         <button
@@ -32,7 +32,7 @@ export default function RightPanel() {
       <hr />
 
       {view === 'personalizacion' ? (
-        <div>
+        <div style={{ overflowY: 'auto', maxHeight: 'calc(100vh - 200px)' }}>
           {currentNodeId ? (
             <SettingsLite />
           ) : (
@@ -42,7 +42,7 @@ export default function RightPanel() {
           )}
         </div>
       ) : (
-        <div style={{ overflow: 'auto', maxHeight: 'calc(100vh - 200px)' }}>
+        <div style={{ overflowY: 'auto', maxHeight: 'calc(100vh - 200px)' }}>
           <Layers expandRootOnLoad={true} />
         </div>
       )}
