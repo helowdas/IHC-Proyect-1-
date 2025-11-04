@@ -156,6 +156,9 @@ export default function Header({ nameSection }) {
     }
   };
 
+  // Previsualizar la sección actual en una nueva pestaña (usa el bundle público)
+  // NOTE: La funcionalidad de previsualización se eliminó por petición del usuario.
+
   // Exportar todas las secciones como SPA: una sola index.html con rutas por sección
   const handleExportAll = async () => {
     try {
@@ -378,13 +381,22 @@ export default function Header({ nameSection }) {
     <div className="d-flex align-items-center justify-content-between px-3 py-2 border-bottom bg-white">
       <div className="d-flex align-items-center gap-3">
         <div className="h4 m-0 fw-bold">Ágora</div>
-        <button 
-          type="button" 
-          className="btn btn-a50104"
-          onClick={() => navigate('/')}
-        >
-          Inicio
-        </button>
+        <div className="d-flex gap-2">
+          <button 
+            type="button" 
+            className="btn btn-a50104"
+            onClick={() => navigate('/')}
+          >
+            Inicio
+          </button>
+          <button
+            type="button"
+            className="btn btn-outline-secondary"
+            onClick={() => navigate('/blogs')}
+          >
+            Blogs
+          </button>
+        </div>
       </div>
       <div className="d-flex align-items-center gap-2">
         <button
@@ -417,6 +429,8 @@ export default function Header({ nameSection }) {
             </svg>
             {isSaving ? 'Guardando…' : 'Guardar'}
         </button>
+        
+        {/* El botón de previsualizar fue removido */}
       
         <button type="button" className="btn btn-danger" onClick={handleClear} disabled={isSaving || isExporting}>
           Limpiar

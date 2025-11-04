@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import Editor from './pages/Editor.jsx';
 import Dashboard from './pages/Dashboard.jsx';
+import Blogs from './pages/Blogs.jsx';
+import BlogPost from './pages/BlogPost.jsx';
 
 // Vista simple para placeholders
 function Page({ title, children }) {
@@ -39,6 +41,10 @@ export default function App() {
 
           {/* Rutas principales */}
           <Route path="/editor" element={<Editor nameSection={"editor"}/>} />
+
+          {/* Blogs y posts */}
+          <Route path="/blogs" element={<Blogs />} />
+          <Route path="/blogs/:id" element={<BlogPost />} />
 
           {/* Rutas del Sidebar usando renderizado condicional por ruta */}
           <Route path="/indice" element={<Page title="Índice">Página índice.</Page>} />
