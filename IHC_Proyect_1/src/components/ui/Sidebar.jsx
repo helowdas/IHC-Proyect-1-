@@ -220,9 +220,9 @@ const Sidebar = ({ items = [] }) => {
   });
 
   return (
-    <aside className="w-64 p-1" style={{ overflowX: 'visible', minWidth: '256px' }}>
+    <aside className="w-64" style={{ overflowX: 'hidden', overflowY: 'auto', minWidth: '256px', padding: '16px', paddingRight: '20px' }}>
       <div className="d-flex justify-content-start mb-3">
-        <div className="text-center w-100" style={{ overflowX: 'visible' }}>
+        <div className="text-center w-100" style={{ overflowX: 'hidden', paddingRight: '12px' }}>
           <div className="d-flex align-items-center justify-content-between mb-2">
             <div className="fw-semibold text-xl">Secciones</div>
             <button
@@ -285,13 +285,15 @@ const Sidebar = ({ items = [] }) => {
             onDragOver={(e) => { e.preventDefault(); }}
             onDrop={handleDropRoot}
             onContextMenu={(e) => handleContextMenu(e, null)}
-            style={{
-              minHeight: '40px',
-              padding: '8px',
-              border: draggedOverFolder === null && draggedSection ? '2px dashed #0d6efd' : 'none',
-              borderRadius: '4px',
-              marginBottom: '8px',
-            }}
+           style={{
+             minHeight: '40px',
+             padding: '12px',
+             paddingRight: '16px',
+             border: draggedOverFolder === null && draggedSection ? '2px dashed #0d6efd' : 'none',
+             borderRadius: '4px',
+             marginBottom: '8px',
+             overflowX: 'hidden',
+           }}
           >
             {folders.length > 0 && (
               <small className="text-muted d-block mb-2">Raíz</small>
@@ -434,22 +436,22 @@ function SectionItem({ name, isActive, onDelete, onRename, onPaste, onDragStart,
       draggable
       onDragStart={handleDragStartLocal}
       className="mb-2 d-flex flex-column align-items-start justify-content-between gap-1"
-      style={{ width: '100%', overflowX: 'visible' }}
+      style={{ width: '100%', overflowX: 'hidden' }}
     >
-      <div className="grow d-flex align-items-center gap-2 w-100" style={{ minWidth: 0 }}>
+      <div className="grow d-flex align-items-center gap-2 w-100" style={{ minWidth: 0, paddingRight: '8px' }}>
         <Link
           to={`/editor?section=${encodeURIComponent(name)}`}
           className={`btn btn-sm btn-a50104 d-inline-flex align-items-center${isActive ? " active" : ""}`}
-          style={{ minWidth: 0, overflow: 'hidden', flex: '1 1 auto', maxWidth: 'calc(100% - 40px)' }}
+          style={{ minWidth: 0, overflow: 'hidden', flex: '1 1 auto', maxWidth: 'calc(100% - 36px)' }}
           title={name}
           aria-label={`Ir a ${name}`}
           aria-current={isActive ? "page" : undefined}
         >
           <i className="bi bi-file-earmark-text fs-5 flex-shrink-0" aria-hidden="true"></i>
-          <span className="ms-1 text-truncate">{name}</span>
+          <span className="ms-1 text-truncate" style={{ maxWidth: '100%' }}>{name}</span>
         </Link>
         
-        <div style={{ flexShrink: 0 }}>
+        <div style={{ flexShrink: 0, marginLeft: '4px' }}>
           <SectionMenu
             sectionName={name}
             onDelete={onDelete}
@@ -500,12 +502,14 @@ function FolderItem({
             onContextMenu(e, folder.id);
           }
         }}
-        style={{
-          border: draggedOver ? '2px dashed #0d6efd' : '1px solid #dee2e6',
-          borderRadius: '4px',
-          padding: '8px',
-          backgroundColor: draggedOver ? '#f0f7ff' : 'transparent',
-        }}
+         style={{
+           border: draggedOver ? '2px dashed #0d6efd' : '1px solid #dee2e6',
+           borderRadius: '4px',
+           padding: '12px',
+           paddingRight: '16px',
+           backgroundColor: draggedOver ? '#f0f7ff' : 'transparent',
+           overflowX: 'hidden',
+         }}
       >
         <div className="d-flex align-items-center justify-content-between mb-2">
           <button
@@ -533,8 +537,8 @@ function FolderItem({
           </button>
         </div>
 
-        {isExpanded && (
-          <div className="ms-3">
+         {isExpanded && (
+           <div className="ms-3" style={{ paddingRight: '12px', overflowX: 'hidden' }}>
             {sections.length === 0 ? (
               <div className="text-muted small">Vacía</div>
             ) : (

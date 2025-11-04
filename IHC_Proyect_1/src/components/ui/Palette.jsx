@@ -14,7 +14,7 @@ export default function Palette() {
   const { connectors } = useEditor();
   const [view, setView] = useState('componentes'); // 'componentes' | 'sidebar'
   return (
-    <div className="p-3 border-end bg-body-tertiary" style={{ width: 280, overflowX: 'visible', minWidth: 280 }}>
+    <div className="p-3 border-end bg-body-tertiary" style={{ width: 280, overflowX: 'hidden', minWidth: 280 }}>
       {/* Toggle buttons */}
       <div className="d-flex gap-2 mb-2">
         <button
@@ -41,7 +41,7 @@ export default function Palette() {
             <small className="text-muted">Arrastra para agregar</small>
           </div>
 
-          <div style={{ overflowY: 'auto', maxHeight: 'calc(100vh - 200px)' }}>
+          <div style={{ overflowY: 'auto', overflowX: 'hidden', maxHeight: 'calc(100vh - 200px)', paddingRight: '12px' }}>
             <div className="d-grid gap-2">
               <button
                 ref={(ref) => ref && connectors.create(ref, <Text text="Texto" fontSize={18} />)}
@@ -110,7 +110,7 @@ export default function Palette() {
           </div>
         </>
       ) : (
-        <div style={{ overflowY: 'auto', maxHeight: 'calc(100vh - 200px)' }}>
+        <div style={{ overflowY: 'auto', overflowX: 'hidden', maxHeight: 'calc(100vh - 200px)', paddingLeft: '12px', paddingRight: '16px' }}>
           <Sidebar />
         </div>
       )}
