@@ -36,7 +36,12 @@ export const ChevronButton = ({
     e.preventDefault();
     let target = to;
     if (!target && sectionName) {
-      target = `/editor?section=${encodeURIComponent(sectionName)}`;
+      // Preservar el sitio actual
+      const site = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('site') : null;
+      const qs = new URLSearchParams();
+      if (site) qs.set('site', site);
+      qs.set('section', sectionName);
+      target = `/editor?${qs.toString()}`;
     }
     if (!target) return;
 

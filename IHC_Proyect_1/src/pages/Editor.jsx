@@ -13,6 +13,8 @@ import { CardBottom, CardTop } from '../components/user/Card';
 import { BackgroundImageContainer } from '../components/user/ImageContainer';
 import { ChevronButton } from '../components/user/ChevronButton';
 import { IconButton } from '../components/user/IconButton';
+import { Columns2, Columns3, Columns4 } from '../components/user/ColumnsContainer';
+import {FileDownload} from "../components/user/FileDownload";
 
 import { Editor, Frame, Element, useEditor } from '@craftjs/core';
 import { useSearchParams } from 'react-router-dom';
@@ -221,7 +223,7 @@ function App({nameSection}) {
   return (
     <div className="min-vh-100 d-flex flex-column bg-light">
 
-      <Editor resolver={{ Card, Button, Text, Image, Container, CardTop, CardBottom, BackgroundImageContainer, ChevronButton, IconButton }}>
+  <Editor resolver={{ Card, Button, Text, Image, Container, CardTop, CardBottom, BackgroundImageContainer, ChevronButton, IconButton, FileDownload }}>
   <Header nameSection={sectionFromQuery} siteId={siteId} />
         {/* Carga el estado inicial del editor desde Supabase según la sección */}
   <SectionDataLoader sectionName={sectionFromQuery} siteId={siteId} />

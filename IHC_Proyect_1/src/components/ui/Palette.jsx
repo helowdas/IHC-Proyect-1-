@@ -8,6 +8,7 @@ import { Card } from '../user/Card';
 import { ChevronButton } from '../user/ChevronButton';
 import { IconButton } from '../user/IconButton';
 import {BackgroundImageContainer} from "../user/ImageContainer";
+import { FileDownload } from '../user/FileDownload';
 import Sidebar from "./Sidebar";
 
 export default function Palette() {
@@ -91,6 +92,8 @@ export default function Palette() {
                 <span className="bi bi-square"></span> Contenedor
               </button>
 
+              {/* Botones de columnas eliminados */}
+
               <button
                 ref={(ref) => ref && connectors.create(ref, <Element is={BackgroundImageContainer} padding={16} background="#ffffff" canvas />)}
                 className="btn btn-light d-flex align-items-center gap-2 text-start"
@@ -105,6 +108,14 @@ export default function Palette() {
                 type="button"
               >
                 <span className="bi bi-credit-card-2-front"></span> Tarjeta
+              </button>
+
+              <button
+                ref={(ref) => ref && connectors.create(ref, <FileDownload />)}
+                className="btn btn-light d-flex align-items-center gap-2 text-start"
+                type="button"
+              >
+                <span className="bi bi-download"></span> Archivo descargable
               </button>
             </div>
           </div>

@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNode, useEditor } from '@craftjs/core';
+import { useNavigate } from 'react-router-dom';
 import IconPicker from '../ui/IconPicker';
 
 export const IconButton = ({
@@ -29,14 +30,21 @@ export const IconButton = ({
     selected: node.events.selected
   }));
   const { actions: { add, selectNode }, query: { createNode, node } } = useEditor();
+  const navigate = useNavigate();
 
   const handleClick = (e) => {
     e.stopPropagation();
     
     if (actionType === 'route' && to) {
-      window.location.href = to;
+      // Navegación interna usando el router (funciona con HashRouter exportado)
+      navigate(to);
     } else if (actionType === 'section' && sectionName) {
-      window.location.href = `/editor?section=${sectionName}`;
+      // Preservar el sitio actual y navegar con router
+      const site = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('site') : null;
+      const qs = new URLSearchParams();
+      if (site) qs.set('site', site);
+      qs.set('section', sectionName);
+      navigate(`/editor?${qs.toString()}`);
     } else if (actionType === 'external' && externalUrl) {
       if (externalNewTab) {
         window.open(externalUrl, '_blank');

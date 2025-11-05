@@ -12,6 +12,8 @@ import { Image } from './components/user/Image';
 import { BackgroundImageContainer } from './components/user/ImageContainer';
 import { ChevronButton } from './components/user/ChevronButton';
 import { IconButton } from './components/user/IconButton';
+// Columns container ha sido retirado del proyecto.
+import { FileDownload } from './components/user/FileDownload';
 
 // Estilos necesarios para que el sitio exportado luzca igual
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -29,13 +31,14 @@ const resolver = {
   BackgroundImageContainer,
   ChevronButton,
   IconButton,
+  FileDownload,
 };
 
 // Dimensiones objetivo del lienzo, igual que en el editor
 const TARGET_W = 1280;
 const TARGET_H = 720;
 // Color de fondo por defecto para la página exportada
-const VIEWER_BG = '#0b090a';
+const VIEWER_BG = '#ffffff';
 
 // Prefetch util: extrae URLs de imágenes desde un objeto/JSON cualquiera
 function collectImageUrls(obj, out = new Set()) {

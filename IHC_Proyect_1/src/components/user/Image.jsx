@@ -37,7 +37,12 @@ export const Image = ({
   const handleClick = (e) => {
     e.preventDefault();
     if (actionType === 'section') {
-      const target = sectionName ? `/editor?section=${encodeURIComponent(sectionName)}` : '';
+      // Preservar el sitio actual en la URL del editor
+      const site = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('site') : null;
+      const qs = new URLSearchParams();
+      if (site) qs.set('site', site);
+      if (sectionName) qs.set('section', sectionName);
+      const target = sectionName ? `/editor?${qs.toString()}` : '';
       if (!target) return;
       if (target.startsWith('#')) {
         const el = document.querySelector(target);
