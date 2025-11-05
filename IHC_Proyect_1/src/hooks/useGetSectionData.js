@@ -1,11 +1,12 @@
 import {supabase} from '../../SupabaseCredentials'
 
-export async function useGetSectionData(sectionName) {
-  const { data, error} = await supabase
+export async function useGetSectionData(sectionName, siteId = null) {
+  let q = supabase
     .from('Secciones')
     .select('json')
-    .eq('nameSeccion', sectionName)
-    .single();
+    .eq('nameSeccion', sectionName);
+  if (siteId) q = q.eq('site_id', siteId);
+  const { data, error} = await q.single();
 
   if (error) {
     console.error('Error fetching section data:', error);

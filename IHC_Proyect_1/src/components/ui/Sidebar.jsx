@@ -8,12 +8,26 @@ import { pasteSection } from "../../hooks/usePasteSection";
 import { hasClipboard } from "../../hooks/useCopyPasteSection";
 import { getFolders, createFolder, deleteFolder, moveSectionToFolder, getSectionFolderId, getSectionsByFolder } from "../../hooks/useFolders";
 import SectionMenu from "./SectionMenu";
+import { getSiteIdBySlug } from "../../hooks/useSites";
 
 const Sidebar = ({ items = [] }) => {
   const { pathname, search } = useLocation();
   const navigate = useNavigate();
-  const currentSection = new URLSearchParams(search).get("section");
-  const { names, loading, error, refetch } = useSectionNames();
+  const qp = new URLSearchParams(search);
+  const currentSection = qp.get("section");
+  const siteSlug = qp.get("site") || null;
+  const [siteId, setSiteId] = useState(null);
+  useEffect(() => {
+    let cancelled = false;
+    async function load() {
+      if (!siteSlug) { setSiteId(null); return; }
+      const id = await getSiteIdBySlug(siteSlug);
+      if (!cancelled) setSiteId(id);
+    }
+    load();
+    return () => { cancelled = true };
+  }, [siteSlug]);
+  const { names, loading, error, refetch } = useSectionNames(siteId);
   const isEditorActive = pathname === "/editor";
   const [newName, setNewName] = useState("");
   const [creating, setCreating] = useState(false);
@@ -52,7 +66,7 @@ const Sidebar = ({ items = [] }) => {
     if (!name) return;
     setCreating(true);
     const initialJson = { ROOT: { type: { resolvedName: 'BackgroundImageContainer' }, isCanvas: true, props: { padding: 10, background: '#f5f5f5' }, displayName: 'BackgroundImageContainer', custom: {}, hidden: false, nodes: [], linkedNodes: {} } };
-    const result = await createSection(name, initialJson);
+  const result = await createSection(name, initialJson, siteId);
     if (result.ok) {
       setNewName("");
       await refetch();
@@ -76,9 +90,9 @@ const Sidebar = ({ items = [] }) => {
       alert('Error creando la carpeta');
     }
   };
-
+  
   const handlePaste = async (newSectionName) => {
-    const result = await pasteSection(newSectionName);
+  const result = await pasteSection(newSectionName, siteId);
     if (result.ok) {
       await refetch();
     } else if (result.code === 'exists') {
@@ -86,12 +100,13 @@ const Sidebar = ({ items = [] }) => {
     } else {
       alert('Error pegando la sección');
     }
+    return result;
   };
 
   const handleDeleteFolder = async (folderId) => {
     if (!confirm('¿Eliminar esta carpeta? Las secciones dentro se moverán a la raíz.')) return;
     
-    const result = await deleteFolder(folderId);
+  const result = await deleteFolder(folderId, siteId);
     if (result.ok) {
       await loadFolders();
       await refetch();
@@ -126,7 +141,7 @@ const Sidebar = ({ items = [] }) => {
   const handleDrop = async (e, folderId) => {
     e.preventDefault();
     if (draggedSection) {
-      const result = await moveSectionToFolder(draggedSection, folderId);
+  const result = await moveSectionToFolder(draggedSection, folderId, siteId);
       if (result.ok) {
         await loadFolders();
       } else {
@@ -140,7 +155,7 @@ const Sidebar = ({ items = [] }) => {
   const handleDropRoot = async (e) => {
     e.preventDefault();
     if (draggedSection) {
-      const result = await moveSectionToFolder(draggedSection, null);
+  const result = await moveSectionToFolder(draggedSection, null, siteId);
       if (result.ok) {
         await loadFolders();
       } else {
@@ -175,7 +190,7 @@ const Sidebar = ({ items = [] }) => {
     const result = await handlePaste(newName.trim());
     if (result && result.ok && contextMenu.folderId) {
       // Si se pegó en una carpeta, mover la sección a esa carpeta
-      await moveSectionToFolder(newName.trim(), contextMenu.folderId);
+      await moveSectionToFolder(newName.trim(), contextMenu.folderId, siteId);
       await loadFolders();
     } else if (result && result.ok) {
       await refetch();
@@ -307,7 +322,7 @@ const Sidebar = ({ items = [] }) => {
                 isActive={isEditorActive && currentSection === name}
                 onDelete={async () => {
                   if (!confirm(`¿Eliminar la sección "${name}"? Esta acción no se puede deshacer.`)) return;
-                  const result = await deleteSection(name);
+                  const result = await deleteSection(name, siteId);
                   if (!result.ok) {
                     console.error('No se pudo eliminar la sección', result.error);
                     alert('Error eliminando la sección');
@@ -319,7 +334,7 @@ const Sidebar = ({ items = [] }) => {
                   const proposed = prompt(`Nuevo nombre para "${name}"`, name);
                   const newName = (proposed || '').trim();
                   if (!newName || newName === name) return;
-                  const res = await renameSection(name, newName);
+                  const res = await renameSection(name, newName, siteId);
                   if (!res.ok) {
                     if (res.code === 'conflict') {
                       alert('Ya existe una sección con ese nombre.');
@@ -334,12 +349,16 @@ const Sidebar = ({ items = [] }) => {
                   await refetch();
                   await loadFolders();
                   if (isEditorActive && currentSection === name) {
-                    navigate(`/editor?section=${encodeURIComponent(newName)}`);
+                    const qs = new URLSearchParams();
+                    if (siteSlug) qs.set('site', siteSlug);
+                    qs.set('section', newName);
+                    navigate(`/editor?${qs.toString()}`);
                   }
                 }}
                 onPaste={handlePaste}
                 onDragStart={handleDragStart}
                 navigate={navigate}
+                siteId={siteId}
               />
             ))}
           </div>
@@ -362,7 +381,7 @@ const Sidebar = ({ items = [] }) => {
               onSectionAction={async (action, sectionName) => {
                 if (action === 'delete') {
                   if (!confirm(`¿Eliminar la sección "${sectionName}"? Esta acción no se puede deshacer.`)) return;
-                  const result = await deleteSection(sectionName);
+                  const result = await deleteSection(sectionName, siteId);
                   if (!result.ok) {
                     alert('Error eliminando la sección');
                   }
@@ -372,7 +391,7 @@ const Sidebar = ({ items = [] }) => {
                   const proposed = prompt(`Nuevo nombre para "${sectionName}"`, sectionName);
                   const newName = (proposed || '').trim();
                   if (!newName || newName === sectionName) return;
-                  const res = await renameSection(sectionName, newName);
+                  const res = await renameSection(sectionName, newName, siteId);
                   if (!res.ok) {
                     if (res.code === 'conflict') {
                       alert('Ya existe una sección con ese nombre.');
@@ -384,13 +403,17 @@ const Sidebar = ({ items = [] }) => {
                   await refetch();
                   await loadFolders();
                   if (isEditorActive && currentSection === sectionName) {
-                    navigate(`/editor?section=${encodeURIComponent(newName)}`);
+                    const qs = new URLSearchParams();
+                    if (siteSlug) qs.set('site', siteSlug);
+                    qs.set('section', newName);
+                    navigate(`/editor?${qs.toString()}`);
                   }
                 }
               }}
               onDragStartSection={handleDragStart}
               navigate={navigate}
               onContextMenu={handleContextMenu}
+              siteId={siteId}
             />
           ))}
 
@@ -424,12 +447,25 @@ const Sidebar = ({ items = [] }) => {
 };
 
 // Componente para renderizar una sección
-function SectionItem({ name, isActive, onDelete, onRename, onPaste, onDragStart, navigate }) {
+function SectionItem({ name, isActive, onDelete, onRename, onPaste, onDragStart, navigate, siteId }) {
   const handleDragStartLocal = (e) => {
     if (onDragStart) {
       onDragStart(e, name);
     }
   };
+
+  // Construir URL destino correctamente (Link no acepta función en `to` en RRv6)
+  const toHref = React.useMemo(() => {
+    try {
+      const qs = new URLSearchParams();
+      const site = new URLSearchParams(window.location.search).get('site');
+      if (site) qs.set('site', site);
+      qs.set('section', name);
+      return `/editor?${qs.toString()}`;
+    } catch {
+      return `/editor?section=${encodeURIComponent(name)}`;
+    }
+  }, [name]);
 
   return (
     <div
@@ -440,7 +476,7 @@ function SectionItem({ name, isActive, onDelete, onRename, onPaste, onDragStart,
     >
       <div className="grow d-flex align-items-center gap-2 w-100" style={{ minWidth: 0, paddingRight: '8px' }}>
         <Link
-          to={`/editor?section=${encodeURIComponent(name)}`}
+          to={toHref}
           className={`btn btn-sm btn-a50104 d-inline-flex align-items-center${isActive ? " active" : ""}`}
           style={{ minWidth: 0, overflow: 'hidden', flex: '1 1 auto', maxWidth: 'calc(100% - 36px)' }}
           title={name}
@@ -457,6 +493,7 @@ function SectionItem({ name, isActive, onDelete, onRename, onPaste, onDragStart,
             onDelete={onDelete}
             onRename={onRename}
             onPaste={onPaste}
+            siteId={siteId}
           />
         </div>
       </div>
@@ -488,6 +525,7 @@ function FolderItem({
   navigate,
   onDragStartSection,
   onContextMenu,
+  siteId,
 }) {
 
   return (
@@ -554,6 +592,7 @@ function FolderItem({
                   }}
                   onDragStart={onDragStartSection}
                   navigate={navigate}
+                  siteId={siteId}
                 />
               ))
             )}

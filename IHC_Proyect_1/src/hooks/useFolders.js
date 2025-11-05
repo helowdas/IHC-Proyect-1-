@@ -57,7 +57,7 @@ export async function createFolder(folderName) {
 /**
  * Elimina una carpeta
  */
-export async function deleteFolder(folderId) {
+export async function deleteFolder(folderId, siteId = null) {
   try {
     // Intentar eliminar desde BD
     const { error } = await supabase
@@ -71,10 +71,12 @@ export async function deleteFolder(folderId) {
     }
 
     // Mover secciones de la carpeta eliminada a la raíz
-    await supabase
+    let q = supabase
       .from('Secciones')
       .update({ folderId: null })
       .eq('folderId', folderId);
+    if (siteId) q = q.eq('site_id', siteId);
+    await q;
 
     return { ok: true };
   } catch (error) {
@@ -86,12 +88,14 @@ export async function deleteFolder(folderId) {
 /**
  * Mueve una sección a una carpeta
  */
-export async function moveSectionToFolder(sectionName, folderId) {
+export async function moveSectionToFolder(sectionName, folderId, siteId = null) {
   try {
-    const { error } = await supabase
+    let q = supabase
       .from('Secciones')
       .update({ folderId: folderId || null })
       .eq('nameSeccion', sectionName);
+    if (siteId) q = q.eq('site_id', siteId);
+    const { error } = await q;
 
     if (error) {
       // Si falla, usar localStorage

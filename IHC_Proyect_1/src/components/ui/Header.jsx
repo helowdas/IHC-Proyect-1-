@@ -6,7 +6,7 @@ import { useUndoHistory } from '../../hooks/useUndoHistory';
 import JSZip from 'jszip';
 import { supabase } from '../../../SupabaseCredentials';
 
-export default function Header({ nameSection }) {
+export default function Header({ nameSection, siteId = null }) {
   const navigate = useNavigate();
   const { enabled, actions, query } = useEditor((state) => ({
     enabled: state.options.enabled,
@@ -48,7 +48,7 @@ export default function Header({ nameSection }) {
       actions.setOptions((opts) => (opts.enabled = false));
       const json = query.serialize();
       console.log('Saving section:', sectionName, json);
-      await saveSectionData(sectionName, json);
+  await saveSectionData(sectionName, json, siteId);
     } catch (e) {
       console.error('Error al guardar la sección', e);
       alert('No se pudo guardar. Revisa la consola para más detalles.');
@@ -167,10 +167,12 @@ export default function Header({ nameSection }) {
       actions.setOptions((opts) => (opts.enabled = false));
 
       // 1) Consultar todas las secciones en Supabase (definir inicio antes de confirmar)
-      const { data: rows, error } = await supabase
+      let q = supabase
         .from('Secciones')
         .select('nameSeccion, json')
         .order('nameSeccion', { ascending: true });
+      if (siteId) q = q.eq('site_id', siteId);
+      const { data: rows, error } = await q;
       if (error) throw error;
       if (!rows || rows.length === 0) {
         alert('No hay secciones para exportar.');

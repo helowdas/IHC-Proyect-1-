@@ -5,7 +5,7 @@ import { getClipboard, clearClipboard } from './useCopyPasteSection';
  * Pega una sección desde el clipboard
  * Si es un cut, elimina la sección original después de pegar
  */
-export async function pasteSection(newSectionName) {
+export async function pasteSection(newSectionName, siteId = null) {
   try {
     const clipboard = getClipboard();
     if (!clipboard) {
@@ -18,10 +18,12 @@ export async function pasteSection(newSectionName) {
     }
 
     // Verificar si ya existe una sección con ese nombre
-    const { count, error: countError } = await supabase
+    let q1 = supabase
       .from('Secciones')
       .select('nameSeccion', { count: 'exact', head: true })
       .eq('nameSeccion', sectionName);
+    if (siteId) q1 = q1.eq('site_id', siteId);
+    const { count, error: countError } = await q1;
 
     if (countError) {
       return { ok: false, error: countError };
@@ -54,7 +56,7 @@ export async function pasteSection(newSectionName) {
     // Supabase acepta objetos JSON directamente en campos jsonb
     const { error: insertError } = await supabase
       .from('Secciones')
-      .insert({ nameSeccion: sectionName, json: sectionData });
+      .insert({ nameSeccion: sectionName, json: sectionData, site_id: siteId });
 
     if (insertError) {
       return { ok: false, error: insertError };
@@ -62,10 +64,12 @@ export async function pasteSection(newSectionName) {
 
     // Si era un cut, eliminar la sección original
     if (clipboard.type === 'cut' && clipboard.sectionName) {
-      const { error: deleteError } = await supabase
+      let q2 = supabase
         .from('Secciones')
         .delete()
         .eq('nameSeccion', clipboard.sectionName);
+      if (siteId) q2 = q2.eq('site_id', siteId);
+      const { error: deleteError } = await q2;
 
       if (deleteError) {
         console.warn('No se pudo eliminar la sección original después de cortar:', deleteError);

@@ -4,16 +4,17 @@ import { supabase } from '../../SupabaseCredentials';
  * Elimina una sección por nombre de la tabla `Secciones`.
  * Retorna { ok, deletedCount, error? }
  */
-export async function deleteSection(nameSeccion) {
+export async function deleteSection(nameSeccion, siteId = null) {
   const name = (nameSeccion || '').trim();
   if (!name) return { ok: false, deletedCount: 0, error: new Error('Nombre inválido') };
 
   try {
-    const { data, error } = await supabase
+    let q = supabase
       .from('Secciones')
       .delete()
-      .eq('nameSeccion', name)
-      .select('nameSeccion');
+      .eq('nameSeccion', name);
+    if (siteId) q = q.eq('site_id', siteId);
+    const { data, error } = await q.select('nameSeccion');
 
     if (error) return { ok: false, deletedCount: 0, error };
 

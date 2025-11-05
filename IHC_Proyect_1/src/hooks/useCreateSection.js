@@ -5,7 +5,7 @@ import { supabase } from '../../SupabaseCredentials';
  * Retorna un objeto con el resultado: { ok, error?, code? }
  * - code: 'exists' cuando ya existía.
  */
-export async function createSection(nameSeccion, initialJson = {}) {
+export async function createSection(nameSeccion, initialJson = {}, siteId = null) {
   const sectionName = (nameSeccion || '').trim();
   if (!sectionName) {
     return { ok: false, error: new Error('El nombre de la sección es requerido') };
@@ -13,10 +13,12 @@ export async function createSection(nameSeccion, initialJson = {}) {
 
   try {
     // Verificar existencia previa (evita duplicados si no hay índice único)
-    const { count, error: countError } = await supabase
+    let q1 = supabase
       .from('Secciones')
       .select('nameSeccion', { count: 'exact', head: true })
       .eq('nameSeccion', sectionName);
+    if (siteId) q1 = q1.eq('site_id', siteId);
+    const { count, error: countError } = await q1;
 
     if (countError) {
       return { ok: false, error: countError };
@@ -29,7 +31,7 @@ export async function createSection(nameSeccion, initialJson = {}) {
     // Insertar nueva sección
     const { error: insertError } = await supabase
       .from('Secciones')
-      .insert({ nameSeccion: sectionName, json: initialJson });
+      .insert({ nameSeccion: sectionName, json: initialJson, site_id: siteId });
 
     if (insertError) {
       // Si tienes índice único y se produjo conflicto

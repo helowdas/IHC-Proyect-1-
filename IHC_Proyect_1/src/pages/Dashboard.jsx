@@ -1,8 +1,30 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { listSites } from '../hooks/useSites';
 
 function Dashboard() {
   const navigate = useNavigate();
+  const [sites, setSites] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [selected, setSelected] = useState('default');
+
+  useEffect(() => {
+    let cancelled = false;
+    async function load() {
+      setLoading(true);
+      const res = await listSites();
+      if (!cancelled) {
+        const arr = res.ok ? (res.sites || []) : [];
+        setSites(arr);
+        if (arr.length > 0 && !arr.find(s => s.slug === selected)) {
+          setSelected(arr[0].slug);
+        }
+        setLoading(false);
+      }
+    }
+    load();
+    return () => { cancelled = true };
+  }, []);
 
   const handleCreateDesign = () => {
     // TODO: Implementar creación de diseño desde cero
@@ -10,13 +32,11 @@ function Dashboard() {
   };
 
   const handleViewDesigns = () => {
-    navigate('/editor');
+    const slug = selected || 'default';
+    navigate(`/editor?site=${encodeURIComponent(slug)}`);
   };
 
-  const handleExportDesigns = () => {
-    // TODO: Implementar exportación
-    alert('Funcionalidad de Exportar Diseños próximamente');
-  };
+  // (Exportar) Eliminado: no se usa más
 
   return (
     <div className="min-vh-100 bg-light d-flex flex-column">
@@ -31,11 +51,26 @@ function Dashboard() {
         </div>
       </div>
 
+      {/* Selector de sitio */}
+      <div className="bg-white border-bottom px-4 py-2">
+        <div className="d-flex gap-2 align-items-center">
+          <label className="mb-0">Sitio:</label>
+          <select className="form-select form-select-sm" style={{ maxWidth: 260 }} value={selected}
+            onChange={(e) => setSelected(e.target.value)} disabled={loading || sites.length === 0}>
+            {sites.length === 0 ? (
+              <option value="default">default</option>
+            ) : (
+              sites.map(s => <option key={s.id} value={s.slug}>{s.name} / {s.slug}</option>)
+            )}
+          </select>
+        </div>
+      </div>
+
       {/* Contenido principal centrado */}
       <div className="flex-grow-1 d-flex align-items-center justify-content-center p-4">
         <div className="w-100" style={{ maxWidth: '1200px' }}>
-          <div className="row g-4">
-            {/* Card 1: Ver Diseños */}
+          <div className="row g-4 justify-content-center">
+            {/* Card 1: Abrir editor */}
             <div className="col-md-4">
               <div className="card h-100 shadow-sm border-0">
                 <div className="card-body d-flex flex-column p-4">
@@ -44,24 +79,24 @@ function Dashboard() {
                       className="rounded-circle bg-light d-flex align-items-center justify-content-center"
                       style={{ width: '64px', height: '64px' }}
                     >
-                      <i className="bi bi-grid-3x3-gap text-danger" style={{ fontSize: '2rem' }}></i>
+                      <i className="bi bi-pencil-square text-danger" style={{ fontSize: '2rem' }}></i>
                     </div>
                   </div>
-                  <h5 className="card-title fw-bold mb-3 text-center">Ver Diseños</h5>
+                  <h5 className="card-title fw-bold mb-3 text-center">Abrir editor</h5>
                   <p className="card-text text-muted mb-4 text-center flex-grow-1">
-                    Explora y gestiona tus proyectos existentes.
+                    Abre el editor para el sitio seleccionado en el menú superior.
                   </p>
                   <button 
                     className="btn btn-a50104 mt-auto"
                     onClick={handleViewDesigns}
                   >
-                    Abrir Galería
+                    Abrir editor
                   </button>
                 </div>
               </div>
             </div>
 
-            {/* Card 2: Crear Diseño */}
+            {/* Card 2: Gestionar Sitios */}
             <div className="col-md-4">
               <div className="card h-100 shadow-sm border-0">
                 <div className="card-body d-flex flex-column p-4">
@@ -70,49 +105,24 @@ function Dashboard() {
                       className="rounded-circle bg-light d-flex align-items-center justify-content-center position-relative"
                       style={{ width: '64px', height: '64px' }}
                     >
-                      <i className="bi bi-display text-danger" style={{ fontSize: '2rem' }}></i>
-                      <i className="bi bi-plus-circle-fill text-danger position-absolute" style={{ fontSize: '1.5rem', bottom: '0', right: '0', lineHeight: '1' }}></i>
+                      <i className="bi bi-gear text-danger" style={{ fontSize: '2rem' }}></i>
                     </div>
                   </div>
-                  <h5 className="card-title fw-bold mb-3 text-center">Crear Diseño</h5>
+                  <h5 className="card-title fw-bold mb-3 text-center">Gestionar sitios</h5>
                   <p className="card-text text-muted mb-4 text-center flex-grow-1">
-                    Empieza un nuevo proyecto desde cero o con plantillas.
+                    Crea, elimina y administra los sitios de tu proyecto.
                   </p>
                   <button 
-                    className="btn btn-danger mt-auto"
-                    onClick={handleCreateDesign}
+                    className="btn btn-outline-secondary mt-auto"
+                    onClick={() => navigate('/sites')}
                   >
-                    Nuevo Diseño
+                    Ir a gestión de sitios
                   </button>
                 </div>
               </div>
             </div>
 
-            {/* Card 3: Exportar Diseños */}
-            <div className="col-md-4">
-              <div className="card h-100 shadow-sm border-0">
-                <div className="card-body d-flex flex-column p-4">
-                  <div className="mb-3 d-flex justify-content-center">
-                    <div 
-                      className="rounded-circle bg-light d-flex align-items-center justify-content-center"
-                      style={{ width: '64px', height: '64px' }}
-                    >
-                      <i className="bi bi-cloud-download text-danger" style={{ fontSize: '2rem' }}></i>
-                    </div>
-                  </div>
-                  <h5 className="card-title fw-bold mb-3 text-center">Exportar Diseños</h5>
-                  <p className="card-text text-muted mb-4 text-center flex-grow-1">
-                    Descarga tus creaciones en varios formatos.
-                  </p>
-                  <button 
-                    className="btn btn-a50104 mt-auto"
-                    onClick={handleExportDesigns}
-                  >
-                    Seleccionar para Exportar
-                  </button>
-                </div>
-              </div>
-            </div>
+            {/* Tarjeta de Exportar eliminada */}
           </div>
         </div>
       </div>

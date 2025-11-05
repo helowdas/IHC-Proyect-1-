@@ -6,7 +6,7 @@ import { supabase } from '../../SupabaseCredentials';
  * - code: 'conflict' si ya existe una sección con el nuevo nombre
  * - code: 'not-found' si no encontró la sección a renombrar
  */
-export async function renameSection(oldName, newName) {
+export async function renameSection(oldName, newName, siteId = null) {
   const fromName = (oldName || '').trim();
   const toName = (newName || '').trim();
 
@@ -19,20 +19,23 @@ export async function renameSection(oldName, newName) {
 
   try {
     // Comprobar conflicto previo
-    const { count: existsCount, error: existsError } = await supabase
+    let q1 = supabase
       .from('Secciones')
       .select('nameSeccion', { count: 'exact', head: true })
       .eq('nameSeccion', toName);
+    if (siteId) q1 = q1.eq('site_id', siteId);
+    const { count: existsCount, error: existsError } = await q1;
 
     if (existsError) return { ok: false, error: existsError };
     if ((existsCount ?? 0) > 0) return { ok: false, code: 'conflict' };
 
     // Actualizar nombre
-    const { data: updated, error: updateError } = await supabase
+    let q2 = supabase
       .from('Secciones')
       .update({ nameSeccion: toName })
-      .eq('nameSeccion', fromName)
-      .select('nameSeccion');
+      .eq('nameSeccion', fromName);
+    if (siteId) q2 = q2.eq('site_id', siteId);
+    const { data: updated, error: updateError } = await q2.select('nameSeccion');
 
     if (updateError) {
       // Conflicto por índice único (si aplica)

@@ -17,22 +17,39 @@ import { IconButton } from '../components/user/IconButton';
 import { Editor, Frame, Element, useEditor } from '@craftjs/core';
 import { useSearchParams } from 'react-router-dom';
 import { useGetSectionData } from '../hooks/useGetSectionData';
+import { getSiteBySlug, getSiteIdBySlug } from '../hooks/useSites';
 
 // Carga el JSON guardado para la sección indicada y lo inyecta al editor
-function SectionDataLoader({ sectionName }) {
+function SectionDataLoader({ sectionName, siteId }) {
   const { actions } = useEditor();
+  const emptyTree = useRef({
+    ROOT: {
+      type: { resolvedName: 'BackgroundImageContainer' },
+      isCanvas: true,
+      props: { padding: 0, background: '#f5f5f5' },
+      displayName: 'BackgroundImageContainer',
+      custom: {},
+      hidden: false,
+      nodes: [],
+      linkedNodes: {},
+    },
+  });
 
   useEffect(() => {
     let cancelled = false;
     async function load() {
       try {
         if (!sectionName) return;
-        const result = await useGetSectionData(sectionName);
+  const result = await useGetSectionData(sectionName, siteId);
         console.log('Section data loaded in Editor:', result);
         if (cancelled) return;
-        if (!result) return;
-        const raw = typeof result === 'string' ? result : JSON.stringify(result);
-        actions.deserialize(raw);
+        if (!result) {
+          // Si no hay datos guardados para esta sección, cargar lienzo vacío
+          actions.deserialize(JSON.stringify(emptyTree.current));
+        } else {
+          const raw = typeof result === 'string' ? result : JSON.stringify(result);
+          actions.deserialize(raw);
+        }
       } catch (e) {
         console.error('No se pudo cargar la sección desde la BD', e);
       }
@@ -41,7 +58,7 @@ function SectionDataLoader({ sectionName }) {
     return () => {
       cancelled = true;
     };
-  }, [sectionName, actions]);
+  }, [sectionName, siteId, actions]);
 
   return null;
 }
@@ -49,6 +66,32 @@ function SectionDataLoader({ sectionName }) {
 function App({nameSection}) {
   const [searchParams] = useSearchParams();
   const sectionFromQuery = searchParams.get('section') || nameSection;
+  const siteSlug = searchParams.get('site') || null;
+  const [siteId, setSiteId] = useState(null);
+  const [siteName, setSiteName] = useState('');
+
+  useEffect(() => {
+    let cancelled = false;
+    async function load() {
+      if (!siteSlug) { setSiteId(null); return; }
+      const id = await getSiteIdBySlug(siteSlug);
+      if (!cancelled) setSiteId(id);
+    }
+    load();
+    return () => { cancelled = true };
+  }, [siteSlug]);
+
+  // Cargar nombre de sitio para mostrarlo centrado sobre el editor
+  useEffect(() => {
+    let cancelled = false;
+    async function loadName() {
+      if (!siteSlug) { setSiteName(''); return; }
+      const res = await getSiteBySlug(siteSlug);
+      if (!cancelled) setSiteName(res.ok && res.site ? (res.site.name || res.site.slug) : siteSlug);
+    }
+    loadName();
+    return () => { cancelled = true };
+  }, [siteSlug]);
   
   // Canvas objetivo 1280x720 y auto-escala si no cabe en el panel central
   const TARGET_W = 1280;
@@ -179,9 +222,9 @@ function App({nameSection}) {
     <div className="min-vh-100 d-flex flex-column bg-light">
 
       <Editor resolver={{ Card, Button, Text, Image, Container, CardTop, CardBottom, BackgroundImageContainer, ChevronButton, IconButton }}>
-        <Header nameSection={sectionFromQuery} />
+  <Header nameSection={sectionFromQuery} siteId={siteId} />
         {/* Carga el estado inicial del editor desde Supabase según la sección */}
-        <SectionDataLoader sectionName={sectionFromQuery} />
+  <SectionDataLoader sectionName={sectionFromQuery} siteId={siteId} />
   <div className="d-flex grow" style={{ minHeight: 0 }}>
           {/* Columna izquierda: Sidebar encima de la paleta de componentes */}
           <div className="d-flex flex-column" style={{ flex: `0 0 ${LEFT_W}px`, width: LEFT_W, minWidth: LEFT_W, maxWidth: LEFT_W, overflowY: 'auto' }}>
@@ -195,6 +238,12 @@ function App({nameSection}) {
             onWheel={onWheelZoom}
             onScroll={onViewportScroll}
           >
+            {/* Nombre del sitio centrado */}
+            <div className="pt-2 pb-1 text-center">
+              <div className="fw-bold" style={{ fontSize: '1.1rem' }}>
+                {siteName || siteSlug || 'Sitio'}
+              </div>
+            </div>
 
             <div className="ps-2 pe-2 pt-2 pb-1 small text-muted">
                 Sección actual: <span className="fw-semibold">{sectionFromQuery || 'Sin sección'}</span>

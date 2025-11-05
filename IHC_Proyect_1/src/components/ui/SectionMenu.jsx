@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { copySection, cutSection, hasClipboard } from '../../hooks/useCopyPasteSection';
 import { useGetSectionData } from '../../hooks/useGetSectionData';
 
-export default function SectionMenu({ sectionName, onDelete, onRename, onPaste, onCopy, onCut }) {
+export default function SectionMenu({ sectionName, onDelete, onRename, onPaste, onCopy, onCut, siteId = null }) {
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef(null);
 
@@ -25,7 +25,7 @@ export default function SectionMenu({ sectionName, onDelete, onRename, onPaste, 
 
   const handleCopy = async () => {
     try {
-      const sectionData = await useGetSectionData(sectionName);
+  const sectionData = await useGetSectionData(sectionName, siteId);
       console.log('Datos copiados de la sección:', sectionName, sectionData);
       if (sectionData) {
         // Verificar que los datos tengan contenido
@@ -47,7 +47,7 @@ export default function SectionMenu({ sectionName, onDelete, onRename, onPaste, 
 
   const handleCut = async () => {
     try {
-      const sectionData = await useGetSectionData(sectionName);
+  const sectionData = await useGetSectionData(sectionName, siteId);
       console.log('Datos cortados de la sección:', sectionName, sectionData);
       if (sectionData) {
         // Verificar que los datos tengan contenido
