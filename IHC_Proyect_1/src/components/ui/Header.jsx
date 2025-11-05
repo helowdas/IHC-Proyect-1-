@@ -17,6 +17,7 @@ export default function Header({ nameSection, siteId = null }) {
   const [importError, setImportError] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
+  const [isPreviewing, setIsPreviewing] = useState(false);
   const sectionName = nameSection || '';
 
   const handleClear = () => {
@@ -56,6 +57,50 @@ export default function Header({ nameSection, siteId = null }) {
       // Al terminar, activar el editor
       actions.setOptions((opts) => (opts.enabled = true));
       setIsSaving(false);
+    }
+  };
+
+  // Previsualizar en nueva pestaña usando el bundle público del viewer
+  const handlePreview = async () => {
+    try {
+      setIsPreviewing(true);
+      actions.setOptions((opts) => (opts.enabled = false));
+      const serialized = query.serialize();
+      const serializedEscaped = JSON.stringify(serialized);
+
+      const html = `<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Previsualización</title>
+    <link rel="stylesheet" href="/craft-renderer-bundle.css" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script>
+      window.global = window.global || window;
+      window.process = window.process || { env: { NODE_ENV: 'production' } };
+      window.__CRAFT_PAGE_STATE__ = JSON.parse(${serializedEscaped});
+    </script>
+    <script src="/craft-renderer-bundle.js"></script>
+  </body>
+</html>`;
+
+      const win = window.open('', '_blank');
+      if (!win) {
+        alert('El navegador bloqueó la ventana de previsualización. Permite popups para continuar.');
+        return;
+      }
+      win.document.open();
+      win.document.write(html);
+      win.document.close();
+    } catch (e) {
+      console.error('Error al previsualizar:', e);
+      alert('No se pudo abrir la previsualización. Revisa la consola.');
+    } finally {
+      actions.setOptions((opts) => (opts.enabled = true));
+      setIsPreviewing(false);
     }
   };
 
@@ -403,7 +448,7 @@ export default function Header({ nameSection, siteId = null }) {
       <div className="d-flex align-items-center gap-2">
         <button
           type="button"
-          className={`btn btn-outline-secondary ${enabled ? '' : 'active'}`}
+          className={`btn btn-a50104 ${enabled ? '' : 'active'}`}
           onClick={() => actions.setOptions((opts) => (opts.enabled = !enabled))}
           disabled={isSaving || isExporting}
         >
@@ -412,7 +457,7 @@ export default function Header({ nameSection, siteId = null }) {
 
         <button
           type="button"
-          className="btn btn-outline-primary d-flex justify-content-between align-items-center gap-2"
+          className="btn btn-a50104 d-flex justify-content-between align-items-center gap-2"
           onClick={undo}
           disabled={!canUndo}
           title="Retroceder (Ctrl+Z)"
@@ -424,7 +469,13 @@ export default function Header({ nameSection, siteId = null }) {
           Deshacer
         </button>
 
-        <button type="button" className="btn btn-success d-flex justify-content-between align-items-center gap-2" onClick={handleSave} disabled={isSaving || isExporting || !sectionName}>
+        {/* El botón de previsualizar fue removido */}
+      
+        <button type="button" className="btn btn-a50104" onClick={handleClear} disabled={isSaving || isExporting}>
+          Limpiar
+        </button>
+
+        <button type="button" className="btn btn-darkRed d-flex justify-content-between align-items-center gap-2" onClick={handleSave} disabled={isSaving || isExporting || !sectionName}>
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-floppy-fill" viewBox="0 0 16 16">
               <path d="M0 1.5A1.5 1.5 0 0 1 1.5 0H3v5.5A1.5 1.5 0 0 0 4.5 7h7A1.5 1.5 0 0 0 13 5.5V0h.086a1.5 1.5 0 0 1 1.06.44l1.415 1.414A1.5 1.5 0 0 1 16 2.914V14.5a1.5 1.5 0 0 1-1.5 1.5H14v-5.5A1.5 1.5 0 0 0 12.5 9h-9A1.5 1.5 0 0 0 2 10.5V16h-.5A1.5 1.5 0 0 1 0 14.5z"/>
               <path d="M3 16h10v-5.5a.5.5 0 0 0-.5-.5h-9a.5.5 0 0 0-.5.5zm9-16H4v5.5a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 .5-.5zM9 1h2v4H9z"/>
@@ -432,12 +483,17 @@ export default function Header({ nameSection, siteId = null }) {
             {isSaving ? 'Guardando…' : 'Guardar'}
         </button>
         
-        {/* El botón de previsualizar fue removido */}
-      
-        <button type="button" className="btn btn-danger" onClick={handleClear} disabled={isSaving || isExporting}>
-          Limpiar
-        </button>
 
+        <button
+          type="button"
+          className="btn btn-a50104"
+          onClick={handlePreview}
+          disabled={isPreviewing || isSaving || isExporting}
+          title="Previsualizar en una pestaña nueva"
+        >
+          Previsualizar
+        </button>
+        
         <button
           type="button"
           className="btn btn-warning d-flex justify-content-between align-items-center gap-2"
